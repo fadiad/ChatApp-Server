@@ -26,6 +26,7 @@ public class User {
     private boolean isMuted;
     private int role;
 
+
     public static class Builder {
 
         private final int id;

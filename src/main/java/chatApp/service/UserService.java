@@ -46,10 +46,10 @@ public class UserService {
     }
 
     public Guest addUser(Guest guest) throws SQLDataException {
-        if (guestRepository.findByNickName(guest.getNickName()) != null) {
-            System.out.println(String.format("Nickname %s exists in guests table", guest.getNickName()));
-            throw new SQLDataException(String.format("Nickname %s exists in guests table",  guest.getNickName()));
-        }
+//        if (guestRepository.findByNickName(guest.getNickName()) != null) {
+//            System.out.println(String.format("Nickname %s exists in guests table", guest.getNickName()));
+//            throw new SQLDataException(String.format("Nickname %s exists in guests table",  guest.getNickName()));
+//        }
         return guestRepository.save(guest);
     }
 

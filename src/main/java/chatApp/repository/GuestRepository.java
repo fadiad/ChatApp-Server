@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Repository;
 
 @Repository
-@EnableJpaRepositories
+//@EnableJpaRepositories
 public interface GuestRepository extends JpaRepository<Guest, String> {
     Guest findByNickName(String nickName);
 }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.Table;
 
 @Repository
-@EnableJpaRepositories
+//@EnableJpaRepositories
 public interface UserRepository extends JpaRepository<User, String> {
         User findByEmail(String email);
 }

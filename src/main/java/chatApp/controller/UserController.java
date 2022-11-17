@@ -1,6 +1,7 @@
 package chatApp.controller;
 
 import chatApp.Entities.Guest;
+import chatApp.Entities.SubmitedUser;
 import chatApp.Entities.User;
 import chatApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +18,12 @@ import java.util.regex.Pattern;
 @RequestMapping("/user")
 public class UserController {
     @Autowired
-    private static UserService userService;
+    private UserService userService;
+
 
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[0-9])(?=.*[a-z]).{8,20}$");
     private static final Pattern emailPattern = Pattern.compile(".+@.+\\.[a-z]+");
     private static final Pattern NAME_PATTERN = Pattern.compile("^[A-Za-z]\\w{5,29}$");
-
-    private UserController() {
-
-    }
 
 
     public boolean validatePassword(String password) {
@@ -63,21 +61,27 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String createUser(@RequestBody User user) {
+    public String createUser(@RequestBody SubmitedUser user) {
+        //User myUser = new User.Builder(1, user.getEmail(), user.getPassword(), user.getNickName()).build();
+        System.out.println("------------am on the top-------------");
+        System.out.println("This is the user : " + user);
         try {
-            System.out.println(user+"++++++++++++++");
+            System.out.println(user + "++++++++++++++");
             if (user.getEmail() == "" && user.getPassword() == "" && user.getNickName() != "") {
+                System.out.println("------------am in the first if-------------");
                 if (validateName(user.getNickName())) {
                     Guest guest = new Guest(user.getNickName());
                     return userService.addUser(guest).toString(); //It is need to be a guest need to send only name
                 } else {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "name is not ok");
                 }
-            } else if (validateName(user.getNickName())
-                    && validatePassword(user.getPassword())
-                    && validateEmail(user.getEmail())) {
-                return userService.addUser(user).toString(); //It is a user need to send full user
-            } else {
+            }
+//            else if (validateName(user.getNickName())
+//                    && validatePassword(user.getPassword())
+//                    && validateEmail(user.getEmail())) {
+//                return userService.addUser(user).toString(); //It is a user need to send full user
+//            }
+            else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "problem, You need to fill in all the details currently");
             }

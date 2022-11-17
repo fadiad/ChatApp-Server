@@ -13,9 +13,6 @@ public class Guest {
     private String nickName;
     private boolean muted;
 
-    public Guest() {
-    }
-
     public Guest(String nickName) {
         this.nickName = nickName;
         this.muted = false;
