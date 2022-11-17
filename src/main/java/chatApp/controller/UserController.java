@@ -65,14 +65,16 @@ public class UserController {
     @RequestMapping(method = RequestMethod.POST)
     public String createUser(@RequestBody User user) {
         try {
-            if (user.getEmail() == null && user.getPassword() == null && user.getName() != null) {
-                if (validateName(user.getName())) {
-                    Guest guest = new Guest(user.getName());
+            if (user.getEmail() == null && user.getPassword() == null && user.getNickName() != null) {
+                if (validateName(user.getNickName())) {
+                    Guest guest = new Guest(user.getNickName());
                     return userService.addUser(guest).toString(); //It is need to be a guest need to send only name
                 } else {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "name is not ok");
                 }
-            } else if (validateName(user.getName()) && validatePassword(user.getPassword()) && validateEmail(user.getEmail())) {
+            } else if (validateName(user.getNickName())
+                    && validatePassword(user.getPassword())
+                    && validateEmail(user.getEmail())) {
                 return userService.addUser(user).toString(); //It is a user need to send full user
             } else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
