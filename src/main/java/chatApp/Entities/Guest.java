@@ -15,18 +15,30 @@ public class Guest {
 
     public Guest() {
     }
+
     public Guest(String nickName) {
         this.nickName = nickName;
-        this.muted=false;
+        this.muted = false;
     }
 
     public String getNickName() {
         return nickName;
     }
+
     public boolean isMuted() {
         return muted;
     }
+
     public void setMuted(boolean muted) {
         this.muted = muted;
+    }
+
+    @Override
+    public String toString() {
+        return "Guest{" +
+                "id=" + id +
+                ", nickName='" + nickName + '\'' +
+                ", muted=" + muted +
+                '}';
     }
 }
