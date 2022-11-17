@@ -1,5 +1,6 @@
 package chatApp.service;
 
+import chatApp.Entities.Guest;
 import chatApp.Entities.User;
 import chatApp.repository.GuestRepository;
 import chatApp.repository.UserRepository;
@@ -17,13 +18,12 @@ import java.util.Map;
 public class UserService {
 
     @Autowired
-    private final UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    private final GuestRepository guestRepository;
+    private GuestRepository guestRepository;
     private Map<String, User> registeredUsers = new HashMap<>();
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserService() {
         loadAllRegisteredUsers();
     }
 
@@ -43,10 +43,10 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User addUser(Guest guest) throws SQLDataException {
-        if (guestRepository.findByNickname(guest.getNickname()) != null) {
-            System.out.println(String.format("Nickname %s exists in guests table", guest.getNickname()));
-            throw new SQLDataException(String.format("Nickname %s exists in guests table",  guest.getNickname()));
+    public Guest addUser(Guest guest) throws SQLDataException {
+        if (guestRepository.findByNickname(guest.getNickName()) != null) {
+            System.out.println(String.format("Nickname %s exists in guests table", guest.getNickName()));
+            throw new SQLDataException(String.format("Nickname %s exists in guests table",  guest.getNickName()));
         }
         return guestRepository.save(guest);
     }
