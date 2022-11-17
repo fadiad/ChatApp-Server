@@ -65,7 +65,8 @@ public class UserController {
     @RequestMapping(method = RequestMethod.POST)
     public String createUser(@RequestBody User user) {
         try {
-            if (user.getEmail() == null && user.getPassword() == null && user.getNickName() != null) {
+            System.out.println(user+"++++++++++++++");
+            if (user.getEmail() == "" && user.getPassword() == "" && user.getNickName() != "") {
                 if (validateName(user.getNickName())) {
                     Guest guest = new Guest(user.getNickName());
                     return userService.addUser(guest).toString(); //It is need to be a guest need to send only name
