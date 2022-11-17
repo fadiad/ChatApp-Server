@@ -23,8 +23,10 @@ public class UserService {
     private GuestRepository guestRepository;
     private Map<String, User> registeredUsers = new HashMap<>();
 
-    public UserService() {
-        loadAllRegisteredUsers();
+    public UserService(UserRepository userRepository,GuestRepository guestRepository) {
+        this.userRepository=userRepository;
+        this.guestRepository=guestRepository;
+      //  loadAllRegisteredUsers();
     }
 
 
@@ -44,7 +46,7 @@ public class UserService {
     }
 
     public Guest addUser(Guest guest) throws SQLDataException {
-        if (guestRepository.findByNickname(guest.getNickName()) != null) {
+        if (guestRepository.findByNickName(guest.getNickName()) != null) {
             System.out.println(String.format("Nickname %s exists in guests table", guest.getNickName()));
             throw new SQLDataException(String.format("Nickname %s exists in guests table",  guest.getNickName()));
         }
