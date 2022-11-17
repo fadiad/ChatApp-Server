@@ -54,7 +54,6 @@ public class ChatController {
                     '}';
         }
     }
-
     static class HelloMessage {
 
         private String name;
