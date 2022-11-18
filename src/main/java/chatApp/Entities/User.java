@@ -4,6 +4,7 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Objects;
 
+
 @Entity
 @Table(name = "user")
 public class User {
@@ -29,7 +30,7 @@ public class User {
 
     public static class Builder {
 
-        private final int id;
+        private int id;
         private final String email;
         private final String password;
         private final String nickName;
@@ -44,8 +45,7 @@ public class User {
         private boolean isMuted = false;
 
 
-        public Builder(int id, String email, String password, String nickName) {
-            this.id = id;
+        public Builder(String email, String password, String nickName) {
             this.email = email;
             this.password = password;
             this.nickName = nickName;
@@ -97,7 +97,11 @@ public class User {
         }
     }
 
-    public User(Builder builder) {
+    public User() {
+
+    }
+
+    private User(Builder builder) {
         this.id = builder.id;
         this.email = builder.email;
         this.password = builder.password;
@@ -115,9 +119,9 @@ public class User {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+//    public void setId(int id) {
+//        this.id = id;
+//    }
 
     public String getEmail() {
         return email;

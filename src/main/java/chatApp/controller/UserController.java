@@ -33,7 +33,7 @@ public class UserController {
 //            return true;
 //        }
 //        return false;
-        if (password.length() >= 6)
+        if (password.length() >= 0)
             return true;
         return false;
     }
@@ -45,43 +45,49 @@ public class UserController {
 //            return true;
 //        }
 //        return false;
-        if (name.length() > 3)
+        if (name.length() > 0)
             return true;
 
         return false;
     }
 
     public boolean validateEmail(String email) {
-        Matcher m = emailPattern.matcher(email);
-        boolean matchFound = m.matches();
-        if (matchFound) {
+//        Matcher m = emailPattern.matcher(email);
+//        boolean matchFound = m.matches();
+//        if (matchFound) {
+//            return true;
+//        }
+//        return false;
+
+        if (email.length() > 0) {
             return true;
         }
+
         return false;
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public String createUser(@RequestBody SubmitedUser user) {
-        //User myUser = new User.Builder(1, user.getEmail(), user.getPassword(), user.getNickName()).build();
-        System.out.println("------------am on the top-------------");
-        System.out.println("This is the user : " + user);
+//        System.out.println("------------am on the top-------------");
+//        System.out.println("This is the user : " + user);
         try {
-            System.out.println(user + "++++++++++++++");
-            if (user.getEmail() == "" && user.getPassword() == "" && user.getNickName() != "") {
-                System.out.println("------------am in the first if-------------");
-                if (validateName(user.getNickName())) {
-                    Guest guest = new Guest(user.getNickName());
-                    return userService.addUser(guest).toString(); //It is need to be a guest need to send only name
-                } else {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "name is not ok");
-                }
-            }
-//            else if (validateName(user.getNickName())
-//                    && validatePassword(user.getPassword())
-//                    && validateEmail(user.getEmail())) {
-//                return userService.addUser(user).toString(); //It is a user need to send full user
-//            }
-            else {
+//            System.out.println(user + "++++++++++++++");
+//            if (user.getEmail() == "" && user.getPassword() == "" && user.getNickName() != "") {
+//                System.out.println("------------am in the first if-------------");
+//                if (validateName(user.getNickName())) {
+//                    Guest guest = new Guest(user.getNickName());
+//                    userService.addUser(guest); //It is need to be a guest need to send only name
+//                    return userService.getAllGuests().toString();
+//                } else {
+//                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "name is not ok");
+//                }
+//            } else
+            if (true) {
+                System.out.println("------------am adding user-------------");
+                User myUser = new User.Builder(user.getEmail(), user.getPassword(), user.getNickName()).build();
+                System.out.println("My user to add : " + myUser);
+                return userService.addUser(myUser).toString(); //It is a user need to send full user
+            } else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "problem, You need to fill in all the details currently");
             }

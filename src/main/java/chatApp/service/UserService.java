@@ -23,10 +23,10 @@ public class UserService {
     private GuestRepository guestRepository;
     private Map<String, User> registeredUsers = new HashMap<>();
 
-    public UserService(UserRepository userRepository,GuestRepository guestRepository) {
-        this.userRepository=userRepository;
-        this.guestRepository=guestRepository;
-      //  loadAllRegisteredUsers();
+    public UserService(UserRepository userRepository, GuestRepository guestRepository) {
+        this.userRepository = userRepository;
+        this.guestRepository = guestRepository;
+        //  loadAllRegisteredUsers();
     }
 
 
@@ -43,6 +43,10 @@ public class UserService {
             throw new SQLDataException(String.format("Email %s exists in users table", user.getEmail()));
         }
         return userRepository.save(user);
+    }
+
+    public List<Guest> getAllGuests() {
+        return guestRepository.findAll();
     }
 
     public Guest addUser(Guest guest) throws SQLDataException {
