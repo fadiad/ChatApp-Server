@@ -101,7 +101,7 @@ public class User {
 
     }
 
-    private User(Builder builder) {
+    User(Builder builder) {
         this.id = builder.id;
         this.email = builder.email;
         this.password = builder.password;
