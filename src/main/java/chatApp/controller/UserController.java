@@ -1,19 +1,20 @@
 package chatApp.controller;
 
-import chatApp.Entities.Guest;
-import chatApp.Entities.Response;
-import chatApp.Entities.SubmitedUser;
+import chatApp.Entities.*;
 import chatApp.service.UserService;
+import chatApp.util.EmailActivation;
 import chatApp.util.ValidationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLDataException;
 import java.util.ArrayList;
 import java.util.List;
-  
+import java.util.Map;
+
 
 @RestController
 @CrossOrigin
@@ -23,7 +24,7 @@ public class UserController {
     private UserService userService;
 
     @RequestMapping(value = "login", method = RequestMethod.POST)
-    public ResponseEntity<Object> login(@RequestBody SubmitedUser user) throws SQLDataException {
+    public ResponseEntity<Object> login(@RequestBody SubmitedUser user) throws SQLDataException, NoSuchAlgorithmException {
         System.out.println("------------Registered User login-------------");
         System.out.println(user);
         String token = "";
@@ -59,7 +60,6 @@ public class UserController {
     }
 
 
-
     @RequestMapping(value = "logout", method = RequestMethod.POST)
     public ResponseEntity<String> logout(@RequestHeader("token") String token) {
 
@@ -69,6 +69,17 @@ public class UserController {
                     .body("some error !");
 
         return ResponseEntity.ok("logout done successfully");
+    }
+
+    @RequestMapping(value = "activate", method = RequestMethod.GET)
+    public ResponseEntity<Object> activateEmail(@RequestParam String code) throws NoSuchAlgorithmException {
+        System.out.println("------------Activate account after login-------------");
+        System.out.println(code);
+        Response response = userService.enterUserToDB(code);
+
+        return ResponseEntity
+                .status(response.getStatus())
+                .body(response.getMessage());
     }
 
 }

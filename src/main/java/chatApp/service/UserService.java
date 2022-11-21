@@ -6,16 +6,17 @@ import chatApp.Entities.SubmitedUser;
 import chatApp.Entities.User;
 import chatApp.repository.GuestRepository;
 import chatApp.repository.UserRepository;
+import chatApp.util.EmailActivation;
 import chatApp.util.ValidationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLDataException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class UserService {
@@ -26,6 +27,11 @@ public class UserService {
     private GuestRepository guestRepository;
     private Map<Integer, String> tokens;
     private Map<String, User> registeredUsers = new HashMap<>();
+    public Map<String, SubmitedUser> useresCode = new HashMap<>();
+
+    public Map<String, SubmitedUser> getUseresCode() {
+        return useresCode;
+    }
 
     public UserService(UserRepository userRepository, GuestRepository guestRepository) {
         this.userRepository = userRepository;
@@ -56,9 +62,25 @@ public class UserService {
         if (userRepository.findByEmail(user.getEmail()) != null)
             return new Response(400, "User is already existed !");
 
-        User myUser = new User.Builder(user.getEmail(), user.getPassword(), user.getNickName()).build();
-        if (userRepository.save(myUser) != null)
+        String code = ValidationUtils.generateRandomToken();
+        useresCode.put(code, user);
+        EmailActivation.sendEmailWithGenerateCode(code, user);
+
+        return new Response(200, "Activate your email to complete the registeration process !");
+    }
+
+    public Response enterUserToDB(String code) throws NoSuchAlgorithmException {
+        SubmitedUser user = useresCode.get(code);
+
+        if (user == null) {
+            return new Response(400, "User that you are trying to validat is not existed");
+        }
+
+        User myUser = new User.Builder(user.getEmail(), ValidationUtils.secretPassword(user.getPassword()), user.getNickName()).build();
+        if (userRepository.save(myUser) != null) {
+            EmailActivation.sendSuccessRegisterationMessageToUser(user);
             return new Response(200, "User is registered successfully");
+        }
 
         return null;
     }
@@ -86,11 +108,11 @@ public class UserService {
     /*
      * we can get user once
      */
-    public String login(SubmitedUser user) {
+    public String login(SubmitedUser user) throws NoSuchAlgorithmException {
         System.out.println("user in login fun : " + user);
         if (isUserValid(user)) {
             int userId = userRepository.findByEmail(user.getEmail()).getId();
-            String token = generateRandomToken();
+            String token = ValidationUtils.generateRandomToken();
             tokens.put(userId, token);
             userRepository.updateUserSetStatusForId("online", userId);
             System.out.println(token);
@@ -99,23 +121,19 @@ public class UserService {
         return null;
     }
 
-    private boolean isUserValid(SubmitedUser user) {
+    private boolean isUserValid(SubmitedUser user) throws NoSuchAlgorithmException {
         return isUserExistedAndPasswordIsFit(user);
     }
 
-    private boolean isUserExistedAndPasswordIsFit(SubmitedUser user) {
+    private boolean isUserExistedAndPasswordIsFit(SubmitedUser user) throws NoSuchAlgorithmException {
         User myUser = userRepository.findByEmail(user.getEmail());
 
-        if (myUser != null & myUser.getPassword().equals(user.getPassword()))
+        if (myUser != null & myUser.getPassword().equals(ValidationUtils.secretPassword(user.getPassword())))
             return true;
 
         return false;
     }
 
-    private String generateRandomToken() {
-        int token = ThreadLocalRandom.current().nextInt(1, Integer.MAX_VALUE);
-        return String.valueOf(token);
-    }
 
     /*
      * Registered user sends his token , if its available we could make logout for him , otherwise we send an error message .
