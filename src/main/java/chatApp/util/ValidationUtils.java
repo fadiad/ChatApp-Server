@@ -1,5 +1,7 @@
 package chatApp.util;
 
+import chatApp.Entities.SubmitedUser;
+
 import java.util.regex.Pattern;
 
 public class ValidationUtils {
@@ -53,6 +55,34 @@ public class ValidationUtils {
     }
 
 
+    public static boolean registrationUserValidation(SubmitedUser user) {
+        if (validateEmail(user.getEmail()) && validatePassword(user.getPassword()) && validateName(user.getNickName())) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean loginUserValidation(SubmitedUser user) {
+        if (validateEmail(user.getEmail()) && validatePassword(user.getPassword())) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean guestValidation(SubmitedUser user) {
+        if (user != null && validateName(user.getNickName())) {
+            return true;
+        }
+        return false;
+    }
 
 
+    public static boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }
