@@ -4,11 +4,11 @@ import java.util.List;
 
 public class Response {
     private String message;
-    private List<Object> obj;
+    private int status;
 
-    public Response(String message, List<Object> obj) {
+    public Response(int status, String message) {
         this.message = message;
-        this.obj = obj;
+        this.status = status;
     }
 
     public String getMessage() {
@@ -19,11 +19,11 @@ public class Response {
         this.message = message;
     }
 
-    public List<Object> getObj() {
-        return obj;
+    public int getStatus() {
+        return status;
     }
 
-    public void setObj(List<Object> obj) {
-        this.obj = obj;
+    public void setObj(int status) {
+        this.status = status;
     }
 }
