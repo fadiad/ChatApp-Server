@@ -16,7 +16,7 @@ public interface GuestRepository extends JpaRepository<Guest, String> {
     Guest findByNickName(String nickName);
 
     @Modifying
-    @Query("delete from Guest where nickName = nickName")
+    @Query("delete from Guest g where g.nickName = :nickName")
     @Transactional
     int deleteUserByNickName(@Param("nickName") String nickName);
 }

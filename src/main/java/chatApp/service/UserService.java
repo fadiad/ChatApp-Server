@@ -158,7 +158,13 @@ public class UserService {
         return true;
     }
 
+
+    public boolean logoutGuest(String nickName) {
+
+        return guestRepository.deleteUserByNickName(nickName) >= 0;
+    }
+
+    public List<Guest> getGuestList() {
+        return guestRepository.findAll();
+    }
 }
-
-
-

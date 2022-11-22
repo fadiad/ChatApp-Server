@@ -4,6 +4,7 @@ import chatApp.Entities.*;
 import chatApp.service.UserService;
 import chatApp.util.EmailActivation;
 import chatApp.util.ValidationUtils;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,14 +42,14 @@ public class UserController {
 
 
     @RequestMapping(value = "loginGuest", method = RequestMethod.POST)
-    public ResponseEntity<List<Guest>> loginGuest(@RequestBody SubmitedUser user) throws SQLDataException {
+    public ResponseEntity<Guest> loginGuest(@RequestBody SubmitedUser user) throws SQLDataException {
         System.out.println("------------guest login-------------");
         if (ValidationUtils.guestValidation(user)) {
             Guest guest = new Guest(user.getNickName());
-            userService.addUser(guest); //It is need to be a guest need to send only name
-            return ResponseEntity.status(HttpStatus.OK).body(userService.getAllGuests());
+             //It is need to be a guest need to send only name
+            return ResponseEntity.status(HttpStatus.OK).body(userService.addUser(guest));
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<>());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
     @RequestMapping(value = "signup", method = RequestMethod.POST)
@@ -59,7 +60,15 @@ public class UserController {
                 .body(response.getMessage());
     }
 
+    @RequestMapping(value = "logoutGuest", method = RequestMethod.POST)
+    public ResponseEntity<String> logoutGuest(@RequestBody SubmitedUser user) {
+        if (!userService.logoutGuest( user.getNickName()))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("some error !");
 
+        return ResponseEntity.ok("logout done successfully");
+    }
     @RequestMapping(value = "logout", method = RequestMethod.POST)
     public ResponseEntity<String> logout(@RequestHeader("token") String token) {
 
@@ -82,6 +91,13 @@ public class UserController {
                 .body(response.getMessage());
     }
 
+    @RequestMapping(value = "onlineGuestUsers", method = RequestMethod.GET)
+    public ResponseEntity<List<Guest>> getGuestList() throws SQLDataException {
+        System.out.println("------------online Users-------------");
+        List<Guest> mylist = userService.getGuestList();
+        System.out.println(mylist);
+        return ResponseEntity.status(HttpStatus.OK).body(mylist);
+    }
 }
 
 
