@@ -4,6 +4,7 @@ import chatApp.Entities.*;
 import chatApp.service.UserService;
 import chatApp.util.EmailActivation;
 import chatApp.util.ValidationUtils;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,7 +60,15 @@ public class UserController {
                 .body(response.getMessage());
     }
 
+    @RequestMapping(value = "logoutGuest", method = RequestMethod.POST)
+    public ResponseEntity<String> logoutGuest(@RequestBody SubmitedUser user) {
+        if (!userService.logoutGuest( user.getNickName()))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("some error !");
 
+        return ResponseEntity.ok("logout done successfully");
+    }
     @RequestMapping(value = "logout", method = RequestMethod.POST)
     public ResponseEntity<String> logout(@RequestHeader("token") String token) {
 
