@@ -99,4 +99,8 @@ public class UserService {
         int token = ThreadLocalRandom.current().nextInt(1, Integer.MAX_VALUE);
         return String.valueOf(token);
     }
+
+    public List<Guest> getGuestList() {
+        return guestRepository.findAll();
+    }
 }

@@ -41,14 +41,14 @@ public class UserController {
 
 
     @RequestMapping(value = "loginGuest", method = RequestMethod.POST)
-    public ResponseEntity<List<Guest>> loginGuest(@RequestBody SubmitedUser user) throws SQLDataException {
+    public ResponseEntity<Guest> loginGuest(@RequestBody SubmitedUser user) throws SQLDataException {
         System.out.println("------------guest login-------------");
         if (user.getNickName() != "") {
             Guest guest = new Guest(user.getNickName());
-            userService.addUser(guest); //It is need to be a guest need to send only name
-            return ResponseEntity.status(HttpStatus.OK).body(userService.getAllGuests());
+             //It is need to be a guest need to send only name
+            return ResponseEntity.status(HttpStatus.OK).body(userService.addUser(guest));
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<>());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
     @RequestMapping(value = "signup", method = RequestMethod.POST)
@@ -64,6 +64,13 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<>());
     }
 
+    @RequestMapping(value = "onlineGuestUsers", method = RequestMethod.GET)
+    public ResponseEntity<List<Guest>> getGuestList() throws SQLDataException {
+        System.out.println("------------online Users-------------");
+        List<Guest> mylist = userService.getGuestList();
+        System.out.println(mylist);
+        return ResponseEntity.status(HttpStatus.OK).body(mylist);
+    }
 }
 
 
