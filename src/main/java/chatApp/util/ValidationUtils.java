@@ -24,7 +24,7 @@ public class ValidationUtils {
 //            return true;
 //        }
 //        return false;
-        if (name.length() > 0)
+        if (name.length() > 3)
             return true;
 
         return false;
@@ -54,7 +54,7 @@ public class ValidationUtils {
 //            return true;
 //        }
 //        return false;
-        if (password.length() >= 0)
+        if (password.length() >= 4)
             return true;
         return false;
     }
