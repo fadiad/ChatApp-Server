@@ -1,13 +1,12 @@
 package chatApp.service;
 
-import chatApp.Entities.Guest;
-import chatApp.Entities.Response;
-import chatApp.Entities.SubmitedUser;
-import chatApp.Entities.User;
+import chatApp.Entities.*;
 import chatApp.repository.GuestRepository;
 import chatApp.repository.UserRepository;
 import chatApp.util.EmailActivation;
 import chatApp.util.ValidationUtils;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,22 +50,22 @@ public class UserService {
     public Response addUser(SubmitedUser user) throws SQLDataException {
 
         if (!ValidationUtils.validateEmail(user.getEmail()))
-            return new Response(400, "Invalid email !");
+            throw new SQLDataException(String.format("Email \" %s \" is not valid!", user.getEmail()));
 
         if (!ValidationUtils.validatePassword(user.getPassword()))
-            return new Response(400, "Invalid user password , password should be more than 8 characters !");
+            throw new SQLDataException(String.format("Password \" %s \" is not valid!", user.getPassword()));
 
         if (!ValidationUtils.validateName(user.getNickName()))
-            return new Response(400, "Invalid nickName , nickName should be more than 3 characters !");
+            throw new SQLDataException(String.format("Nickname \" %s \" is not valid!", user.getNickName()));
 
         if (userRepository.findByEmail(user.getEmail()) != null)
-            return new Response(400, "User is already existed !");
+            throw new SQLDataException(String.format("Email \" %s \" is Already Exist!", user.getEmail()));
 
         String code = ValidationUtils.generateRandomToken();
         useresCode.put(code, user);
         EmailActivation.sendEmailWithGenerateCode(code, user);
 
-        return new Response(200, "Activate your email to complete the registeration process !");
+        return new Response(200, "Activate your email to complete the registration process !");
     }
 
     public Response enterUserToDB(String code) throws NoSuchAlgorithmException {
@@ -127,10 +126,10 @@ public class UserService {
 
     private boolean isUserExistedAndPasswordIsFit(SubmitedUser user) throws NoSuchAlgorithmException {
         User myUser = userRepository.findByEmail(user.getEmail());
-
-        if (myUser != null & myUser.getPassword().equals(ValidationUtils.secretPassword(user.getPassword())))
+        if (myUser == null)
+            return false;
+        else if (myUser.getPassword().equals(ValidationUtils.secretPassword(user.getPassword())))
             return true;
-
         return false;
     }
 
@@ -141,21 +140,21 @@ public class UserService {
      * If the token is numeric it means it's a registered user ,else if it's not , so he is a guest and it's his name .
      */
     public boolean logout(String token) {
-
-        if (ValidationUtils.isNumeric(token)) {
+        Gson g = new Gson();
+        Token t = g.fromJson(token, Token.class);
+        String mytoken = t.getToken();
+        System.out.println(mytoken);
+        if (ValidationUtils.isNumeric(mytoken)) {
             for (int id : tokens.keySet())
-                if (tokens.get(id).equals(token)) {
+                if (tokens.get(id).equals(mytoken)) {
                     tokens.remove(id);
                     userRepository.updateUserSetStatusForId("offline", id);
                     return true;
                 }
             return false;
         }
+        return false;
 
-        if (guestRepository.deleteUserByNickName(token) < 0)
-            return false;
-
-        return true;
     }
 
 
@@ -167,4 +166,29 @@ public class UserService {
     public List<Guest> getGuestList() {
         return guestRepository.findAll();
     }
+
+    public List<User> getUserList() {
+        List<User> userList = userRepository.findAll();
+        List<User> res = new ArrayList<>();
+        for (User u : userList) {
+            if (u.getStatus().equals("online"))
+                res.add(u);
+        }
+        return res;
+    }
+
+    public User getUserByToken(String token) {
+        Integer myid = -1;
+        Gson g = new Gson();
+        Token t = g.fromJson(token, Token.class);
+
+        for (Integer key : tokens.keySet()) {
+            if (tokens.get(key).equals(t.getToken()))
+                myid = key;
+        }
+        User result = userRepository.findUserById(myid);
+        return result;
+    }
+
+
 }

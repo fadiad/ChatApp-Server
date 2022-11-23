@@ -15,6 +15,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Table;
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Repository
 //@EnableJpaRepositories
@@ -27,4 +28,5 @@ public interface UserRepository extends JpaRepository<User, String> {
     int updateUserSetStatusForId(@Param("status") String status,
                                  @Param("id") int id);
 
+    User findUserById(Integer myid);
 }
