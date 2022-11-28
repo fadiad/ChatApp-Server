@@ -11,7 +11,7 @@ public class Guest {
     private int id;
     @Column(unique = true)
     private String nickName;
-    private boolean muted;
+    private boolean isMuted;
 
     public Guest() {
 
@@ -19,7 +19,7 @@ public class Guest {
 
     public Guest(String nickName) {
         this.nickName = nickName;
-        this.muted = false;
+        this.isMuted = false;
     }
 
     public String getNickName() {
@@ -27,11 +27,11 @@ public class Guest {
     }
 
     public boolean isMuted() {
-        return muted;
+        return isMuted;
     }
 
     public void setMuted(boolean muted) {
-        this.muted = muted;
+        this.isMuted = muted;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class Guest {
         return "Guest{" +
                 "id=" + id +
                 ", nickName='" + nickName + '\'' +
-                ", muted=" + muted +
+                ", muted=" + isMuted +
                 '}';
     }
 }

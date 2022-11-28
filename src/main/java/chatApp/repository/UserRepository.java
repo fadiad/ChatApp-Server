@@ -1,8 +1,10 @@
 package chatApp.repository;
 
+import chatApp.Entities.Guest;
 import chatApp.Entities.User;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.annotations.Entity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -28,5 +30,25 @@ public interface UserRepository extends JpaRepository<User, String> {
     int updateUserSetStatusForId(@Param("status") String status,
                                  @Param("id") int id);
 
+    @Modifying
+    @Query("update User u set u.isMuted =true where u.id =:id")
+    @Transactional
+    int mute(@Param("id") int id);
+
+    @Modifying
+    @Query("update User u set u.isMuted =false where u.id =:id")
+    @Transactional
+    int unMute(@Param("id") int id);
+
+
+
+
+//    @Modifying
+//    @Query(value = "select id from user ", nativeQuery = true)
+//    @Transactional
+//    List<User> findAll();
+
     User findUserById(Integer myid);
+
+
 }

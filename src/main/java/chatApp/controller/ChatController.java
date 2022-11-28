@@ -1,11 +1,17 @@
 package chatApp.controller;
 
+import chatApp.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
 @Controller
 public class ChatController {
+
+    @Autowired
+    private UserService userService;
+
     @MessageMapping("/hello")
     @SendTo("/topic/mainChat")
     public ChatMessage greeting(HelloMessage message) throws Exception {
@@ -15,12 +21,18 @@ public class ChatController {
     @MessageMapping("/plain")
     @SendTo("/topic/mainChat")
     public ChatMessage sendPlainMessage(ChatMessage message) {
-        return message;
+        System.out.println(message);
+        if (!userService.isUserMuted(message.token)) {
+            return message;
+        }
+        return null;
     }
 
     static class ChatMessage {
         private String sender;
         private String content;
+        private String token;
+
 
         public ChatMessage() {
         }
@@ -28,6 +40,14 @@ public class ChatController {
         public ChatMessage(String sender, String content) {
             this.sender = sender;
             this.content = content;
+        }
+
+        public String getToken() {
+            return token;
+        }
+
+        public void setToken(String token) {
+            this.token = token;
         }
 
         public String getSender() {
@@ -51,6 +71,7 @@ public class ChatController {
             return "ChatMessage{" +
                     "sender='" + sender + '\'' +
                     ", content='" + content + '\'' +
+                    ", token='" + token + '\'' +
                     '}';
         }
     }

@@ -51,7 +51,7 @@ public class EmailActivation {
         String.valueOf(user.getEmail());
         to = user.getEmail();
         MimeMessage message = prepare();
-        String link = "Please activate Your ChatApp Account Now, click on the link:" + "http://localhost:8080/user/activate?code=" + code;
+        String link = "Please activate Your ChatApp Account Now, click on the link:" + "http://localhost:8080/auth/activate?code=" + code;
 
         try {
             message = prepareThisMessage(message, user, link);
