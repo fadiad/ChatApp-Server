@@ -62,6 +62,20 @@ public class UserController {
                 .body(g.toJson(response.getMessage()));
     }
 
+
+    @RequestMapping(value = "saveProfile", method = RequestMethod.POST)
+    public ResponseEntity<String> saveProfile(@RequestBody User user) throws SQLDataException {
+
+        System.out.println("in controller: "+ user);
+        Response response = userService.saveProfile(user);
+        Gson g = new Gson();
+        return ResponseEntity
+                .status(response.getStatus())
+                .body(g.toJson(response.getMessage()));
+    }
+
+
+
     @RequestMapping(value = "logoutGuest", method = RequestMethod.POST)
     public ResponseEntity<String> logoutGuest(@RequestBody SubmitedUser user) {
         if (!userService.logoutGuest(user.getNickName()))
@@ -105,6 +119,13 @@ public class UserController {
     public ResponseEntity<User> getUserByToken(@RequestBody String token) throws SQLDataException {
         System.out.println("------------User By Token-------------");
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserByToken(token));
+    }
+
+
+    @RequestMapping(value = "userById", method = RequestMethod.POST)
+    public ResponseEntity<User> getUserById(@RequestBody String id) throws SQLDataException {
+        System.out.println("------------User By ID-------------");
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(id));
     }
 
     @RequestMapping(value = "onlineUsers", method = RequestMethod.GET)
