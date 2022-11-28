@@ -42,12 +42,6 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 
 
-
-//    @Modifying
-//    @Query(value = "select id from user ", nativeQuery = true)
-//    @Transactional
-//    List<User> findAll();
-
     User findUserById(Integer myid);
 
 
