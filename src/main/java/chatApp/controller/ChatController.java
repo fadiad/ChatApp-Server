@@ -22,9 +22,13 @@ public class ChatController {
     @SendTo("/topic/mainChat")
     public ChatMessage sendPlainMessage(ChatMessage message) {
         System.out.println(message);
-        if (!userService.isUserMuted(message.token)) {
+
+        if (message.token == null)
+            return null;
+
+        if (!userService.isUserMuted(message.token))
             return message;
-        }
+
         return null;
     }
 

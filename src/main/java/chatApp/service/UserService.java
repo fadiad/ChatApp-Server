@@ -11,10 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLDataException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -69,6 +66,33 @@ public class UserService {
 
         return new Response(200, "Activate your email to complete the registration process !");
     }
+
+
+    /**
+     * Adds a user to the database if it has a unique email
+     *
+     * @param user - the user's data
+     * @return a saved user with it's generated id
+     * @throws SQLDataException when the provided email already exists
+     */
+    public Response saveProfile(User user) throws SQLDataException {
+
+        if (!ValidationUtils.validateName(user.getNickName()))
+            throw new SQLDataException(String.format("Nickname \" %s \" is not valid!", user.getNickName()));
+        if (!ValidationUtils.validateName(user.getFirstName()))
+            throw new SQLDataException(String.format("First Name \" %s \" is not valid!", user.getFirstName()));
+        if (!ValidationUtils.validateName(user.getLastName()))
+            throw new SQLDataException(String.format("Last Name \" %s \" is not valid!", user.getLastName()));
+        System.out.println("new profile :" + user);
+        user.setPassword(userRepository.findByEmail(user.getEmail()).getPassword());
+        user.setRole(userRepository.findByEmail(user.getEmail()).getRole());
+        user.setIsMuted(userRepository.findByEmail(user.getEmail()).getIsMuted());
+
+        userRepository.delete(userRepository.findByEmail(user.getEmail()));
+        userRepository.save(user);
+        return new Response(200, "new profile saved successfully!");
+    }
+
 
     public Response enterUserToDB(String code) throws NoSuchAlgorithmException {
         SubmitedUser user = useresCode.get(code);
@@ -151,10 +175,10 @@ public class UserService {
      * Guest sends his name , so we delete him from Guests DB .
      * If the token is numeric it means it's a registered user ,else if it's not , so he is a guest and it's his name .
      */
-    public boolean logout(String mytoken) {
-//        Gson g = new Gson();
-//        Token t = g.fromJson(token, Token.class);
-//        String mytoken = t.getToken();
+    public boolean logout(String token) {
+        Gson g = new Gson();
+        Token t = g.fromJson(token, Token.class);
+        String mytoken = t.getToken();
         System.out.println(mytoken);
         if (ValidationUtils.isNumeric(mytoken)) {
             for (int id : usersTokens.keySet())
@@ -170,9 +194,22 @@ public class UserService {
     }
 
 
-    public boolean logoutGuest(String nickName) {
+    public boolean logoutGuest(String token) {
+        System.out.println("---------logout Guest---------");
 
-        return guestRepository.deleteUserByNickName(nickName) >= 0;
+        Gson g = new Gson();
+        Token t = g.fromJson(token, Token.class);
+        for (String nickName : guestsTokens.keySet()) {
+            if (guestsTokens.get(nickName).equals(t.getToken())) {
+                int delresult = guestRepository.deleteUserByNickName(nickName);
+                if (delresult > 0) {
+                    guestsTokens.remove(nickName);
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public List<Guest> getGuestList() {
@@ -183,7 +220,7 @@ public class UserService {
         List<User> userList = userRepository.findAll();
         List<User> res = new ArrayList<>();
         for (User u : userList) {
-            if (u.getStatus().equals("online"))
+            if (!Objects.equals(u.getStatus(), "offline"))////////////////
                 res.add(u);
         }
         return res;
@@ -201,6 +238,7 @@ public class UserService {
         User result = userRepository.findUserById(myid);
         return result;
     }
+
 
     public Response mute(String token, String id) {
         System.out.println("----------muting---------");
@@ -254,8 +292,8 @@ public class UserService {
         Gson g = new Gson();
         Token t = g.fromJson(token, Token.class);
         String mytoken = t.getToken();
-        System.out.println(mytoken + "    " + userRepository.findUserById(143).getRole());
-        User u = userRepository.findUserById(143);
+//        System.out.println(mytoken + "    " + userRepository.findUserById(143).getRole());
+//        User u = userRepository.findUserById(143);
         for (int id : usersTokens.keySet()) {
             if (usersTokens.get(id).equals(mytoken)) {
                 User user = userRepository.findUserById(id);
@@ -279,7 +317,7 @@ public class UserService {
         }
         System.out.println("checked users");
         for (String nickName : guestsTokens.keySet()) {
-            System.out.println("token : " + token) ;
+            System.out.println("token : " + token);
             if (guestsTokens.get(nickName).equals(token)) {
                 Guest guest = guestRepository.findByNickName(nickName);
                 if (guest.isMuted())
@@ -288,6 +326,16 @@ public class UserService {
         }
 
         return false;
+    }
+
+
+    public User getUserById(String id) {
+        System.out.println(id);
+        Gson g = new Gson();
+        Token t = g.fromJson(id, Token.class);
+        System.out.println(t);
+        User result = userRepository.findUserById(Integer.valueOf(t.getToken()));
+        return result;
     }
 
 

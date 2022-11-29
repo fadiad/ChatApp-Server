@@ -25,7 +25,9 @@ public class User {
     private String description;
     private String status;
     private boolean isMuted;
+    private boolean isPrivate;
     private int role;
+    private String imgUrl;
 
 
     public static class Builder {
@@ -42,7 +44,9 @@ public class User {
         private String description = "description";
         private String status = "status";
         private int role = 0;
+        private String imgUrl = "https://bootdey.com/img/Content/avatar/avatar7.png";
         private boolean isMuted = false;
+        private boolean isPrivate = false;
 
 
         public Builder(String email, String password, String nickName) {
@@ -87,8 +91,18 @@ public class User {
             return this;
         }
 
+        public Builder imgUrl(String imgUrl) {
+            this.imgUrl = imgUrl;
+            return this;
+        }
+
         public Builder isMuted(boolean isMuted) {
             this.isMuted = isMuted;
+            return this;
+        }
+
+        public Builder isPrivate(boolean isPrivate) {
+            this.isPrivate = isPrivate;
             return this;
         }
 
@@ -113,6 +127,8 @@ public class User {
         this.description = builder.description;
         this.status = builder.status;
         this.role = builder.role;
+        this.imgUrl = builder.imgUrl;
+        this.isPrivate= builder.isPrivate;
     }
 
     public int getId() {
@@ -208,8 +224,24 @@ public class User {
         return isMuted;
     }
 
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(boolean aPrivate) {
+        isPrivate = aPrivate;
+    }
+
     public void setRole(int role) {
         this.role = role;
+    }
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
     }
 
     @Override
@@ -240,6 +272,8 @@ public class User {
                 ", status='" + status + '\'' +
                 ", isMuted=" + isMuted +
                 ", role=" + role +
+                ", imgUrl=" + imgUrl +
+                ", isPrivate=" + isPrivate +
                 '}';
     }
 }

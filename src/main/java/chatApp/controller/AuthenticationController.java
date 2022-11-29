@@ -62,8 +62,8 @@ public class AuthenticationController {
     }
 
     @RequestMapping(value = "logoutGuest", method = RequestMethod.POST)
-    public ResponseEntity<String> logoutGuest(@RequestBody SubmitedUser user) {
-        if (!userService.logoutGuest(user.getNickName()))
+    public ResponseEntity<String> logoutGuest(@RequestBody String token) {
+        if (!userService.logoutGuest(token))
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("some error !");
