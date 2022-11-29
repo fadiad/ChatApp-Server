@@ -40,7 +40,10 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Transactional
     int unMute(@Param("id") int id);
 
-
+    @Modifying
+    @Query("update User u set u.id = :oldId where u.email =:email")
+    @Transactional
+    int updateId(@Param("oldId") int id,@Param("email") String email);
 
     User findUserById(Integer myid);
 

@@ -42,7 +42,7 @@ public class User {
         private LocalDate birthDate = LocalDate.now();
         private int age = 0;
         private String description = "description";
-        private String status = "status";
+        private String status = "offline";
         private int role = 0;
         private String imgUrl = "https://bootdey.com/img/Content/avatar/avatar7.png";
         private boolean isMuted = false;
