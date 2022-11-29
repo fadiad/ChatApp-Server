@@ -87,9 +87,11 @@ public class UserService {
         user.setPassword(userRepository.findByEmail(user.getEmail()).getPassword());
         user.setRole(userRepository.findByEmail(user.getEmail()).getRole());
         user.setIsMuted(userRepository.findByEmail(user.getEmail()).getIsMuted());
-
-        userRepository.delete(userRepository.findByEmail(user.getEmail()));
+        User u = userRepository.findByEmail(user.getEmail());
+        userRepository.delete(u);
         userRepository.save(user);
+        userRepository.updateId(u.getId(), u.getEmail());
+
         return new Response(200, "new profile saved successfully!");
     }
 
@@ -308,9 +310,11 @@ public class UserService {
 
     public boolean isUserMuted(String token) {
         System.out.println("the token  : " + token);
-        for (int id : usersTokens.keySet()) {
+        for (Integer id : usersTokens.keySet()) {
             if (usersTokens.get(id).equals(token)) {
                 User user = userRepository.findUserById(id);
+                System.out.println("***: " + id);
+                System.out.println("***: " + user);
                 if (user.getIsMuted())
                     return true;
             }
