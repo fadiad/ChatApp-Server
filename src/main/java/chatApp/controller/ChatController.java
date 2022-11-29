@@ -1,49 +1,73 @@
 package chatApp.controller;
 
+import chatApp.Entities.ChatMessage;
+import chatApp.service.ChatService;
 import chatApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @Controller
 public class ChatController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    ChatService chatService;
 
     @MessageMapping("/hello")
     @SendTo("/topic/mainChat")
-    public ChatMessage greeting(HelloMessage message) throws Exception {
-        return new ChatMessage("SYSTEM", message.getName() + "joined the chat");
+    public RecievedMessage greeting(HelloMessage message) {
+        return new RecievedMessage("SYSTEM", message.getName() + "joined the chat");
     }
 
     @MessageMapping("/plain")
     @SendTo("/topic/mainChat")
-    public ChatMessage sendPlainMessage(ChatMessage message) {
+    public RecievedMessage sendPlainMessage(RecievedMessage message) {
         System.out.println(message);
 
         if (message.token == null)
             return null;
 
-        if (!userService.isUserMuted(message.token))
+        if (!userService.isUserMuted(message.token)) {
+            ChatMessage chatMessage = new ChatMessage(message.getSender(), message.getContent(), message.getChatId());
+            chatService.saveMessagesToDB(chatMessage);
             return message;
-
+        }
         return null;
     }
 
-    static class ChatMessage {
+
+
+    static class RecievedMessage {
         private String sender;
         private String content;
         private String token;
+        private String chatId;
 
-
-        public ChatMessage() {
+        public String getChatId() {
+            return chatId;
         }
 
-        public ChatMessage(String sender, String content) {
+        public void setChatId(String chatId) {
+            this.chatId = chatId;
+        }
+
+        public RecievedMessage() {
+        }
+
+        public RecievedMessage(String sender, String content) {
             this.sender = sender;
             this.content = content;
+            this.chatId = chatId;
         }
 
         public String getToken() {

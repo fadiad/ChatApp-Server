@@ -1,6 +1,7 @@
 package chatApp.controller;
 
 import chatApp.Entities.*;
+import chatApp.service.ChatService;
 import chatApp.service.UserService;
 import chatApp.util.EmailActivation;
 import chatApp.util.ValidationUtils;
@@ -26,6 +27,9 @@ import java.util.stream.Collectors;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ChatService chatService;
 
 
     @RequestMapping(value = "login", method = RequestMethod.POST)
@@ -153,6 +157,20 @@ public class UserController {
         System.out.println(mylist);
         return ResponseEntity.status(HttpStatus.OK).body(mylist);
     }
+
+    @RequestMapping(value = "/history", method = RequestMethod.GET)
+    public ResponseEntity<List<ChatMessage>> AllMessageHistoryMainChat(@RequestParam String chatId) {
+        System.out.println("----------chat messages---------");
+        System.out.println(chatId instanceof String);
+        System.out.println("chatId : " + chatId);
+        List<ChatMessage> newList = chatService.getAllMessagesByChatId(chatId);
+        System.out.println(newList);
+        return ResponseEntity.status(HttpStatus.OK).body(newList); //list with all message of the "id" room.
+    }
+
+
+
+
 }
 
 
