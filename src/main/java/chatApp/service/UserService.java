@@ -198,9 +198,13 @@ public class UserService {
 
     public boolean logoutGuest(String token) {
         System.out.println("---------logout Guest---------");
-
+        System.out.println(token);
         Gson g = new Gson();
         Token t = g.fromJson(token, Token.class);
+        System.out.println(t);
+        System.out.println(t.getToken());
+
+
         for (String nickName : guestsTokens.keySet()) {
             if (guestsTokens.get(nickName).equals(t.getToken())) {
                 int delresult = guestRepository.deleteUserByNickName(nickName);
@@ -343,4 +347,16 @@ public class UserService {
     }
 
 
+    public boolean addForTest(SubmitedUser user) throws NoSuchAlgorithmException {
+        if (user == null) {
+            return false;
+        }
+
+        User myUser = new User.Builder(user.getEmail(), ValidationUtils.secretPassword(user.getPassword()), user.getNickName()).build();
+        if (userRepository.save(myUser) != null) {
+            EmailActivation.sendSuccessRegisterationMessageToUser(user);
+            return true;
+        }
+        return false;
+    }
 }
