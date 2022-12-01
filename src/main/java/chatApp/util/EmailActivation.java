@@ -11,13 +11,13 @@ import java.util.Properties;
 public class EmailActivation {
 
     private static String to;
-    private static final String from = "saraysara1996@gmail.com";
+    private static final String from = "graychairs1982@gmail.com";
     private static String host = "smtp.sendgrid.net";
     private static Properties properties = System.getProperties();
 
     static Session session = Session.getInstance(properties, new Authenticator() {
         protected PasswordAuthentication getPasswordAuthentication() {
-            return new PasswordAuthentication("apikey", "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");
+            return new PasswordAuthentication("apikey", "111");
         }
     });
 
