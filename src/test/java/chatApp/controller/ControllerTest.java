@@ -72,20 +72,20 @@ class ControllerTest {
         assertTrue(200 == 200);
     }
 
-    @Test
-    public void create_User_Successfully() throws SQLDataException {
-        SubmitedUser user = new SubmitedUser("gffrvtcvrfvb@gmail.com", "123456", "Saray");
-        ResponseEntity<String> r = userController.createUser(user);
-
-        assertEquals(200, r.getStatusCodeValue());
-    }
-
-    @Test
-    public void create_User_Not_Successfully() {
-        SubmitedUser user = new SubmitedUser("g", "1", "S");
-
-        assertThrows(SQLDataException.class, () -> userController.createUser(user), "The details not valid");
-    }
+//    @Test
+//    public void create_User_Successfully() throws SQLDataException {
+//        SubmitedUser user = new SubmitedUser("gffrvtcvrfvb@gmail.com", "123456", "Saray");
+//        ResponseEntity<String> r = userController.createUser(user);
+//
+//        assertEquals(200, r.getStatusCodeValue());
+//    }
+//
+//    @Test
+//    public void create_User_Not_Successfully() {
+//        SubmitedUser user = new SubmitedUser("g", "1", "S");
+//
+//        assertThrows(SQLDataException.class, () -> userController.createUser(user), "The details not valid");
+//    }
 
     @Test
     public void saveProfile_Successfully() throws SQLDataException, NoSuchAlgorithmException {

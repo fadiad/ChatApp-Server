@@ -81,14 +81,16 @@ public class UserController {
      * then, keep him on map until he activates his email.
      * @throws IllegalArgumentException if there is a validated problems
      */
-    @RequestMapping(value = "signup", method = RequestMethod.POST)
-    public ResponseEntity<String> createUser(@RequestBody SubmitedUser user) throws IllegalArgumentException {
-        Response response = userService.addUser(user); //It is a user need to send full user
-        Gson g = new Gson();
-        return ResponseEntity
-                .status(response.getStatus())
-                .body(g.toJson(response.getMessage()));
-    }
+//    @RequestMapping(value = "signup", method = RequestMethod.POST)
+//    public ResponseEntity<String> createUser(@RequestBody SubmitedUser user) throws IllegalArgumentException {
+//
+//
+//        Response response = userService.addUser(user); //It is a user need to send full user
+//        Gson g = new Gson();
+//        return ResponseEntity
+//                .status(response.getStatus())
+//                .body(g.toJson(response.getMessage()));
+//    }
 
 
     /**
@@ -229,14 +231,14 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(newList); //list with all message of the "id" room.
     }
 
-    public SubmitedUser addUserForTestToDB() throws NoSuchAlgorithmException {
-        SubmitedUser user = new SubmitedUser("saraysara1996@gmail.com", "12345", "Saray");
-        User myUser = new User.Builder(user.getEmail(), ValidationUtils.secretPassword(user.getPassword()), user.getNickName()).build();
-        if (userService.addForTest(user)) {
-            return user;
-        }
-        return null;
-    }
+//    public SubmitedUser addUserForTestToDB() throws NoSuchAlgorithmException {
+//        SubmitedUser user = new SubmitedUser("saraysara1996@gmail.com", "12345", "Saray");
+//        User myUser = new User.Builder(user.getEmail(), ValidationUtils.secretPassword(user.getPassword()), user.getNickName()).build();
+//        if (userService.addForTest(user)) {
+//            return user;
+//        }
+//        return null;
+//    }
 
     public String addGuestForTestToDB() throws SQLDataException {
         SubmitedUser user = new SubmitedUser(" ", " ", "Saraa");

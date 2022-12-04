@@ -1,6 +1,7 @@
 package chatApp.service;
 
 import chatApp.Entities.*;
+import chatApp.repository.ActivateRepository;
 import chatApp.repository.GuestRepository;
 import chatApp.repository.UserRepository;
 import chatApp.util.EmailActivation;
@@ -19,6 +20,8 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private GuestRepository guestRepository;
+    @Autowired
+    private ActivateRepository activateRepository;
     private Map<Integer, String> usersTokens;
     private Map<String, String> guestsTokens;
 
@@ -45,26 +48,17 @@ public class UserService {
      * @return a saved user with it's generated id
      * @throws IllegalArgumentException when the provided email already exists
      */
-    public Response addUser(SubmitedUser user) throws IllegalArgumentException {
-
-        if (!ValidationUtils.validateEmail(user.getEmail()))
-            throw new IllegalArgumentException(String.format("Email \" %s \" is not valid!", user.getEmail()));
-
-        if (!ValidationUtils.validatePassword(user.getPassword()))
-            throw new IllegalArgumentException(String.format("Password \" %s \" is not valid!", user.getPassword()));
-
-        if (!ValidationUtils.validateName(user.getNickName()))
-            throw new IllegalArgumentException(String.format("Nickname \" %s \" is not valid!", user.getNickName()));
-
-        if (userRepository.findByEmail(user.getEmail()) != null)
-            throw new IllegalArgumentException(String.format("Email \" %s \" is Already Exist!", user.getEmail()));
-
-        String code = ValidationUtils.generateRandomToken();
-        useresCode.put(code, user);
-        EmailActivation.sendEmailWithGenerateCode(code, user);
-
-        return new Response(200, "Activate your email to complete the registration process !");
-    }
+//    public Response addUser(SubmitedUser user) throws IllegalArgumentException {
+//
+//        if (userRepository.findByEmail(user.getEmail()) != null)
+//            throw new IllegalArgumentException(String.format("Email \" %s \" is Already Exist!", user.getEmail()));
+//
+//        String code = ValidationUtils.generateRandomToken();
+//        useresCode.put(code, user);
+//        EmailActivation.sendEmailWithGenerateCode(code, user);
+//
+//        return new Response(200, "Activate your email to complete the registration process !");
+//    }
 
 
     /**
@@ -96,16 +90,18 @@ public class UserService {
 
 
     public Response enterUserToDB(String code) throws NoSuchAlgorithmException,IllegalArgumentException {
-        SubmitedUser user = useresCode.get(code);
-
+        ActiveUser user = activateRepository.findByCode(code);
+        System.out.println("-----------------Enter User to DB------------------");
+        System.out.println(user);
         if (user == null) {
-            return new Response(400, "User that you are trying to validat is not existed");
+            throw new IllegalArgumentException(String.format("Your Code is not Valid!"));
         }
-
         User myUser = new User.Builder(user.getEmail(), ValidationUtils.secretPassword(user.getPassword()), user.getNickName()).build();
         if (userRepository.save(myUser) != null) {
             EmailActivation.sendSuccessRegisterationMessageToUser(user);
+            activateRepository.delete(user);
             return new Response(200, "User is registered successfully");
+
         }
 
         return null;
@@ -346,16 +342,16 @@ public class UserService {
     }
 
 
-    public boolean addForTest(SubmitedUser user) throws NoSuchAlgorithmException {
-        if (user == null) {
-            return false;
-        }
-
-        User myUser = new User.Builder(user.getEmail(), ValidationUtils.secretPassword(user.getPassword()), user.getNickName()).build();
-        if (userRepository.save(myUser) != null) {
-            EmailActivation.sendSuccessRegisterationMessageToUser(user);
-            return true;
-        }
-        return false;
-    }
+//    public boolean addForTest(SubmitedUser user) throws NoSuchAlgorithmException {
+//        if (user == null) {
+//            return false;
+//        }
+//
+//        User myUser = new User.Builder(user.getEmail(), ValidationUtils.secretPassword(user.getPassword()), user.getNickName()).build();
+//        if (userRepository.save(myUser) != null) {
+//            EmailActivation.sendSuccessRegisterationMessageToUser(user);
+//            return true;
+//        }
+//        return false;
+//    }
 }

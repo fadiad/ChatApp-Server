@@ -1,7 +1,6 @@
 package chatApp.util;
 
-import chatApp.Entities.SubmitedUser;
-import chatApp.Entities.User;
+import chatApp.Entities.ActiveUser;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -17,7 +16,7 @@ public class EmailActivation {
 
     static Session session = Session.getInstance(properties, new Authenticator() {
         protected PasswordAuthentication getPasswordAuthentication() {
-            return new PasswordAuthentication("apikey", "111");
+            return new PasswordAuthentication("apikey", "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");
         }
     });
 
@@ -32,7 +31,7 @@ public class EmailActivation {
         return message;
     }
 
-    public static void sendSuccessRegisterationMessageToUser(SubmitedUser user) {
+    public static void sendSuccessRegisterationMessageToUser(ActiveUser user) {
         String.valueOf(user.getEmail());
         to = user.getEmail();
         MimeMessage message = prepare();
@@ -47,7 +46,7 @@ public class EmailActivation {
     }
 
 
-    public static void sendEmailWithGenerateCode(String code, SubmitedUser user) {
+    public static void sendEmailWithGenerateCode(String code, ActiveUser user) {
         String.valueOf(user.getEmail());
         to = user.getEmail();
         MimeMessage message = prepare();
@@ -63,7 +62,7 @@ public class EmailActivation {
     }
 
 
-    private static MimeMessage prepareThisMessage(MimeMessage message, SubmitedUser user, String messageText) throws MessagingException {
+    private static MimeMessage prepareThisMessage(MimeMessage message, ActiveUser user, String messageText) throws MessagingException {
         message.setFrom(new InternetAddress(from));
         message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
         message.setSubject(user.getNickName() + "," + "welcome to the ChatApp application!");
