@@ -17,7 +17,7 @@ public class EmailActivation {
 
     static Session session = Session.getInstance(properties, new Authenticator() {
         protected PasswordAuthentication getPasswordAuthentication() {
-            return new PasswordAuthentication("apikey", "111");
+            return new PasswordAuthentication("apikey", "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");
         }
     });
 

@@ -35,7 +35,6 @@ public class UserService {
         this.guestRepository = guestRepository;
         usersTokens = new HashMap<>();
         guestsTokens = new HashMap<>();
-        //  loadAllRegisteredUsers();
     }
 
 
@@ -133,14 +132,6 @@ public class UserService {
         return null;
     }
 
-    public void loadAllRegisteredUsers() {
-        List<User> users = new ArrayList<>();
-        userRepository.findAll().forEach(users::add);
-        for (User user : users)
-            this.registeredUsers.put(user.getEmail(), user);
-    }
-
-
     /*
      * we can get user once
      */
@@ -182,6 +173,8 @@ public class UserService {
         Token t = g.fromJson(token, Token.class);
         String mytoken = t.getToken();
         System.out.println(mytoken);
+
+
         if (ValidationUtils.isNumeric(mytoken)) {
             for (int id : usersTokens.keySet())
                 if (usersTokens.get(id).equals(mytoken)) {
@@ -261,7 +254,6 @@ public class UserService {
     public Response muteGuest(String token, String nickName) {
         System.out.println("----------muteGuest---------");
         if (isAdmin(token)) {
-//            int i = Integer.parseInt(nickName);
             guestRepository.mute(nickName);
             System.out.println("user after muting" + guestRepository.findAll());
             return new Response(200, "User is muted!");
@@ -298,8 +290,7 @@ public class UserService {
         Gson g = new Gson();
         Token t = g.fromJson(token, Token.class);
         String mytoken = t.getToken();
-//        System.out.println(mytoken + "    " + userRepository.findUserById(143).getRole());
-//        User u = userRepository.findUserById(143);
+
         for (int id : usersTokens.keySet()) {
             if (usersTokens.get(id).equals(mytoken)) {
                 User user = userRepository.findUserById(id);
@@ -314,6 +305,14 @@ public class UserService {
 
     public boolean isUserMuted(String token) {
         System.out.println("the token  : " + token);
+
+        if (isRegisteredUserMuted(token) || isGuestMuted(token))
+            return true;
+
+        return false;
+    }
+
+    private boolean isRegisteredUserMuted(String token) {
         for (Integer id : usersTokens.keySet()) {
             if (usersTokens.get(id).equals(token)) {
                 User user = userRepository.findUserById(id);
@@ -323,7 +322,10 @@ public class UserService {
                     return true;
             }
         }
-        System.out.println("checked users");
+        return false;
+    }
+
+    private boolean isGuestMuted(String token) {
         for (String nickName : guestsTokens.keySet()) {
             System.out.println("token : " + token);
             if (guestsTokens.get(nickName).equals(token)) {
@@ -332,7 +334,6 @@ public class UserService {
                     return true;
             }
         }
-
         return false;
     }
 
