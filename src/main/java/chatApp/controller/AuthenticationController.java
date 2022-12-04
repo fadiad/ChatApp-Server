@@ -12,7 +12,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
@@ -30,10 +29,10 @@ public class AuthenticationController {
     /**
      * @param user details
      * @return check validations and return the token of the user if he succeeded to log in
-     * @throws SQLDataException validations problems
+     * @throws IllegalArgumentException validations problems
      */
     @RequestMapping(value = "login", method = RequestMethod.POST)
-    public ResponseEntity<Object> login(@RequestBody SubmitedUser user) throws SQLDataException, NoSuchAlgorithmException {
+    public ResponseEntity<Object> login(@RequestBody SubmitedUser user) throws IllegalArgumentException, NoSuchAlgorithmException {
         System.out.println("------------Registered User login-------------");
         System.out.println(user);
         String token = "";
@@ -43,7 +42,7 @@ public class AuthenticationController {
         }
 
         if (token == null)
-            throw new SQLDataException(String.format("email or password is not correct !"));
+            throw new IllegalArgumentException(String.format("email or password is not correct !"));
 
         return ResponseEntity.ok(token);
     }
@@ -52,16 +51,16 @@ public class AuthenticationController {
     /**
      * @param user details of guest details
      * @return guest in the body response if he logged in and pass the validations.
-     * @throws SQLDataException validations problems
+     * @throws IllegalArgumentException validations problems
      */
     @RequestMapping(value = "loginGuest", method = RequestMethod.POST)
-    public ResponseEntity<Object> loginGuest(@RequestBody SubmitedUser user) throws SQLDataException {
+    public ResponseEntity<Object> loginGuest(@RequestBody SubmitedUser user) throws IllegalArgumentException {
         System.out.println("------------guest login-------------");
         if (ValidationUtils.guestValidation(user)) {
             Guest guest = new Guest(user.getNickName());
             return ResponseEntity.status(HttpStatus.OK).body(userService.addGuest(guest));
         }
-        throw new SQLDataException(String.format("Nickname \" %s \" is not valid!", user.getNickName()));
+        throw new IllegalArgumentException(String.format("Nickname \" %s \" is not valid!", user.getNickName()));
     }
 
 
@@ -69,10 +68,10 @@ public class AuthenticationController {
      * @param user details
      * @return check the user details, validation, and send an email with code,
      * then, keep him on map until he activates his email.
-     * @throws SQLDataException if there is a validated problems
+     * @throws IllegalArgumentException if there is a validated problems
      */
     @RequestMapping(value = "signup", method = RequestMethod.POST)
-    public ResponseEntity<String> createUser(@RequestBody SubmitedUser user) throws SQLDataException {
+    public ResponseEntity<String> createUser(@RequestBody SubmitedUser user) throws IllegalArgumentException {
         Response response = userService.addUser(user); //It is a user need to send full user
         Gson g = new Gson();
         return ResponseEntity
