@@ -1,6 +1,5 @@
 package chatApp.controller;
 
-
 import chatApp.Entities.Guest;
 import chatApp.Entities.Response;
 import chatApp.Entities.SubmitedUser;
@@ -37,13 +36,10 @@ public class AuthenticationController {
      */
     @RequestMapping(value = "login", method = RequestMethod.POST)
     public ResponseEntity<Object> login(@RequestBody SubmitedUser user) throws IllegalArgumentException, NoSuchAlgorithmException {
-        System.out.println("------------Registered User login-------------");
-        System.out.println(user);
         String token = "";
 
-        if (ValidationUtils.loginUserValidation(user)) {
+        if (ValidationUtils.loginUserValidation(user))
             token = userService.login(user);
-        }
 
         if (token == null)
             throw new IllegalArgumentException(String.format("email or password is not correct !"));
@@ -59,11 +55,12 @@ public class AuthenticationController {
      */
     @RequestMapping(value = "loginGuest", method = RequestMethod.POST)
     public ResponseEntity<Object> loginGuest(@RequestBody SubmitedUser user) throws IllegalArgumentException {
-        System.out.println("------------guest login-------------");
+
         if (ValidationUtils.guestValidation(user)) {
             Guest guest = new Guest(user.getNickName());
             return ResponseEntity.status(HttpStatus.OK).body(userService.addGuest(guest));
         }
+
         throw new IllegalArgumentException(String.format("Nickname \" %s \" is not valid!", user.getNickName()));
     }
 
@@ -85,17 +82,26 @@ public class AuthenticationController {
         if (!ValidationUtils.validateName(user.getNickName()))
             throw new IllegalArgumentException(String.format("Nickname \" %s \" is not valid!", user.getNickName()));
 
-        String myCode = ValidationUtils.generateRandomToken();
-        System.out.println("myCode: "+myCode);
-        ActiveUser activeU = new ActiveUser(user.getEmail(), user.getPassword(), user.getNickName(), myCode);
 
-        EmailActivation.sendEmailWithGenerateCode(myCode,activeU);
+        if (!userService.isUserRegistered(user)) {
 
-        Boolean response = activateService.keepOnDB(activeU);
+            String myCode = ValidationUtils.generateRandomToken();
+
+            ActiveUser activeU = new ActiveUser(user.getEmail(), user.getPassword(), user.getNickName(), myCode);
+
+            EmailActivation.sendEmailWithGenerateCode(myCode, activeU);
+
+            Boolean response = activateService.keepOnDB(activeU);
+
+            return ResponseEntity
+                    .status(200)
+                    .body("added to dataBase for activation users");
+        }
 
         return ResponseEntity
-                .status(200)
-                .body("added to dataBase for activation users");
+                .status(400)
+                .body("User is already existed !");
+
     }
 
     @RequestMapping(value = "logoutGuest", method = RequestMethod.POST)
@@ -107,6 +113,7 @@ public class AuthenticationController {
 
         return ResponseEntity.ok("logout done successfully");
     }
+
     /**
      * @param token of the online user
      * @return response 200 if he found the token in the map, he log out the user. else error
@@ -129,8 +136,7 @@ public class AuthenticationController {
      */
     @RequestMapping(value = "activate", method = RequestMethod.GET)
     public ResponseEntity<Object> activateEmail(@RequestParam String code) throws NoSuchAlgorithmException {
-        System.out.println("------------Activate account after login-------------");
-        System.out.println(code);
+
         Response response = userService.enterUserToDB(code);
 
         return ResponseEntity

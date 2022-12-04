@@ -11,14 +11,15 @@ public class ActivateService {
     @Autowired
     ActivateRepository activateRepository;
 
-
     public boolean keepOnDB(ActiveUser response) {
         if (response != null) {
             if(activateRepository.findByEmail(response.getEmail())!=null)
                 throw new IllegalArgumentException(String.format("You Are Already Registered!! Please Activate Your Account On Email!"));
+
             activateRepository.save(response);
             return true;
         }
+
         return false;
     }
 }

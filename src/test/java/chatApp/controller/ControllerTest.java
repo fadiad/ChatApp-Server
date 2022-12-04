@@ -234,4 +234,21 @@ class ControllerTest {
 //        ResponseEntity<String> r = userController.logoutGuest(user);
 //        assertEquals(200, r.getStatusCodeValue());
 //    }
+
+
+//    public SubmitedUser addUserForTestToDB() throws NoSuchAlgorithmException {
+//        SubmitedUser user = new SubmitedUser("saraysara1996@gmail.com", "12345", "Saray");
+//        User myUser = new User.Builder(user.getEmail(), ValidationUtils.secretPassword(user.getPassword()), user.getNickName()).build();
+//        if (userService.addForTest(user)) {
+//            return user;
+//        }
+//        return null;
+//    }
+//
+//    public String addGuestForTestToDB() throws SQLDataException {
+//        SubmitedUser user = new SubmitedUser(" ", " ", "Saraa");
+//        Guest g = new Guest(user.getNickName());
+//        return userService.addGuest(g);
+//    }
+
 }

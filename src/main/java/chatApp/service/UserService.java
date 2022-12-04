@@ -40,25 +40,12 @@ public class UserService {
     }
 
 
-    /**
-     * Adds a user to the database if it has a unique email
-     *
-     * @param user - the user's data
-     * @return a saved user with it's generated id
-     * @throws IllegalArgumentException when the provided email already exists
-     */
-//    public Response addUser(SubmitedUser user) throws IllegalArgumentException {
-//
-//        if (userRepository.findByEmail(user.getEmail()) != null)
-//            throw new IllegalArgumentException(String.format("Email \" %s \" is Already Exist!", user.getEmail()));
-//
-//        String code = ValidationUtils.generateRandomToken();
-//        useresCode.put(code, user);
-//        EmailActivation.sendEmailWithGenerateCode(code, user);
-//
-//        return new Response(200, "Activate your email to complete the registration process !");
-//    }
+    public boolean isUserRegistered(SubmitedUser user) {
+        if (userRepository.findByEmail(user.getEmail()) != null)
+            throw new IllegalArgumentException(String.format("Email \" %s \" is Already Exist!", user.getEmail()));
 
+        return false;
+    }
 
     /**
      * Adds a user to the database if it has a unique email
@@ -75,7 +62,7 @@ public class UserService {
             throw new IllegalArgumentException(String.format("First Name \" %s \" is not valid!", user.getFirstName()));
         if (!ValidationUtils.validateName(user.getLastName()))
             throw new IllegalArgumentException(String.format("Last Name \" %s \" is not valid!", user.getLastName()));
-        System.out.println("new profile :" + user);
+
         user.setPassword(userRepository.findByEmail(user.getEmail()).getPassword());
         user.setRole(userRepository.findByEmail(user.getEmail()).getRole());
         user.setIsMuted(userRepository.findByEmail(user.getEmail()).getIsMuted());
@@ -87,20 +74,18 @@ public class UserService {
         return new Response(200, "new profile saved successfully!");
     }
 
-
-    public Response enterUserToDB(String code) throws NoSuchAlgorithmException,IllegalArgumentException {
+    public Response enterUserToDB(String code) throws NoSuchAlgorithmException, IllegalArgumentException {
         ActiveUser user = activateRepository.findByCode(code);
-        System.out.println("-----------------Enter User to DB------------------");
-        System.out.println(user);
-        if (user == null) {
+
+        if (user == null)
             throw new IllegalArgumentException(String.format("Your Code is not Valid!"));
-        }
+
         User myUser = new User.Builder(user.getEmail(), ValidationUtils.secretPassword(user.getPassword()), user.getNickName()).build();
+
         if (userRepository.save(myUser) != null) {
             EmailActivation.sendSuccessRegisterationMessageToUser(user);
             activateRepository.delete(user);
             return new Response(200, "User is registered successfully");
-
         }
 
         return null;
@@ -111,10 +96,8 @@ public class UserService {
     }
 
     public String addGuest(Guest SubmittedGuest) throws IllegalArgumentException {
-        if (guestRepository.findByNickName(SubmittedGuest.getNickName()) != null) {
-            System.out.println(String.format("Nickname %s exists in guests table", SubmittedGuest.getNickName()));
+        if (guestRepository.findByNickName(SubmittedGuest.getNickName()) != null)
             throw new IllegalArgumentException(String.format("Nickname %s exists in guests table", SubmittedGuest.getNickName()));
-        }
 
         Guest savedGuest = guestRepository.save(SubmittedGuest);
 
@@ -127,18 +110,12 @@ public class UserService {
         return null;
     }
 
-    /*
-     * we can get user once
-     */
-    public String login(SubmitedUser user) throws NoSuchAlgorithmException , IllegalArgumentException{
-        System.out.println("user in login fun : " + user);
+    public String login(SubmitedUser user) throws NoSuchAlgorithmException, IllegalArgumentException {
         if (isUserValid(user)) {
             int userId = userRepository.findByEmail(user.getEmail()).getId();
             String token = ValidationUtils.generateRandomToken();
             usersTokens.put(userId, token);
-            System.out.println("usersToken : " + usersTokens);
             userRepository.updateUserSetStatusForId("online", userId);
-            System.out.println(token);
             return token;
         }
         return null;
@@ -150,51 +127,48 @@ public class UserService {
 
     private boolean isUserExistedAndPasswordIsFit(SubmitedUser user) throws IllegalArgumentException, NoSuchAlgorithmException {
         User myUser = userRepository.findByEmail(user.getEmail());
+
         if (myUser == null)
             return false;
+
         else if (myUser.getPassword().equals(ValidationUtils.secretPassword(user.getPassword())))
             return true;
+
         return false;
     }
 
 
-    /*
+    /**
      * Registered user sends his token , if its available we could make logout for him , otherwise we send an error message .
      * Guest sends his name , so we delete him from Guests DB .
      * If the token is numeric it means it's a registered user ,else if it's not , so he is a guest and it's his name .
+     *
+     * @param token
+     * @return
      */
     public boolean logout(String token) {
-        Gson g = new Gson();
-        Token t = g.fromJson(token, Token.class);
-        String mytoken = t.getToken();
-        System.out.println(mytoken);
 
+        String myToken = convertToken(token, Token.class);
 
-        if (ValidationUtils.isNumeric(mytoken)) {
-            for (int id : usersTokens.keySet())
-                if (usersTokens.get(id).equals(mytoken)) {
-                    usersTokens.remove(id);
-                    userRepository.updateUserSetStatusForId("offline", id);
-                    return true;
-                }
+        if (ValidationUtils.isNumeric(myToken)) {
+            User user = getUserByToken(myToken);
+            if (usersTokens.get(user.getId()).equals(myToken)) {
+                usersTokens.remove(user.getId());
+                userRepository.updateUserSetStatusForId("offline", user.getId());
+                return true;
+            }
             return false;
         }
         return false;
-
     }
 
 
     public boolean logoutGuest(String token) {
-        System.out.println("---------logout Guest---------");
-        System.out.println(token);
-        Gson g = new Gson();
-        Token t = g.fromJson(token, Token.class);
-        System.out.println(t);
-        System.out.println(t.getToken());
 
+        String myToken = convertToken(token, Token.class);
 
         for (String nickName : guestsTokens.keySet()) {
-            if (guestsTokens.get(nickName).equals(t.getToken())) {
+            if (guestsTokens.get(nickName).equals(myToken)) {
                 int delresult = guestRepository.deleteUserByNickName(nickName);
                 if (delresult > 0) {
                     guestsTokens.remove(nickName);
@@ -213,33 +187,30 @@ public class UserService {
     public List<User> getUserList() {
         List<User> userList = userRepository.findAll();
         List<User> res = new ArrayList<>();
-        for (User u : userList) {
-            if (!Objects.equals(u.getStatus(), "offline"))////////////////
+
+        for (User u : userList)
+            if (!Objects.equals(u.getStatus(), "offline"))
                 res.add(u);
-        }
+
         return res;
     }
 
     public User getUserByToken(String token) {
         Integer myid = -1;
-//        Gson g = new Gson();
-//        Token t = g.fromJson(token, Token.class);
 
-        for (Integer key : usersTokens.keySet()) {
+        for (Integer key : usersTokens.keySet())
             if (usersTokens.get(key).equals(token))
                 myid = key;
-        }
+
         User result = userRepository.findUserById(myid);
         return result;
     }
 
 
     public Response mute(String token, String id) {
-        System.out.println("----------muting---------");
         if (isAdmin(token)) {
             int i = Integer.parseInt(id);
             userRepository.mute(i);
-            System.out.println("user after muting" + userRepository.findAll());
             return new Response(200, "User is muted!");
         }
 
@@ -247,10 +218,8 @@ public class UserService {
     }
 
     public Response muteGuest(String token, String nickName) {
-        System.out.println("----------muteGuest---------");
         if (isAdmin(token)) {
             guestRepository.mute(nickName);
-            System.out.println("user after muting" + guestRepository.findAll());
             return new Response(200, "User is muted!");
         }
 
@@ -258,49 +227,38 @@ public class UserService {
     }
 
     public Response unMute(String token, String id) {
-        System.out.println("----------unMuting---------");
         if (isAdmin(token)) {
             int i = Integer.parseInt(id);
             userRepository.unMute(i);
-            System.out.println("user after unMuting" + userRepository.findAll());
             return new Response(200, "User is un muted!");
         }
+
         return new Response(404, "Can't unmute user!");
     }
 
 
     public Response unmuteGuest(String token, String nickName) {
-        System.out.println("----------unmuteGuest---------");
         if (isAdmin(token)) {
             guestRepository.unMute(nickName);
-            System.out.println("user after unMuting" + guestRepository.findAll());
             return new Response(200, "User is un muted!");
         }
+
         return new Response(404, "Can't unmute user!");
     }
 
     private boolean isAdmin(String token) {
-        System.out.println("usersTokens = " + usersTokens);
 
-        Gson g = new Gson();
-        Token t = g.fromJson(token, Token.class);
-        String mytoken = t.getToken();
+        String mytoken = convertToken(token, Token.class);
+        User user = getUserByToken(mytoken);
 
-        for (int id : usersTokens.keySet()) {
-            if (usersTokens.get(id).equals(mytoken)) {
-                User user = userRepository.findUserById(id);
-                if (user.getRole() == 1)
-                    return true;
-            }
-        }
-        System.out.println("not admin");
+        if (user.getRole() == 1)
+            return true;
+
         return false;
     }
 
 
     public boolean isUserMuted(String token) {
-        System.out.println("the token  : " + token);
-
         if (isRegisteredUserMuted(token) || isGuestMuted(token))
             return true;
 
@@ -308,21 +266,17 @@ public class UserService {
     }
 
     private boolean isRegisteredUserMuted(String token) {
-        for (Integer id : usersTokens.keySet()) {
-            if (usersTokens.get(id).equals(token)) {
-                User user = userRepository.findUserById(id);
-                System.out.println("***: " + id);
-                System.out.println("***: " + user);
-                if (user.getIsMuted())
-                    return true;
-            }
-        }
+        User user = getUserByToken(token);
+
+        if (user != null)
+            if (user.getIsMuted())
+                return true;
+
         return false;
     }
 
     private boolean isGuestMuted(String token) {
         for (String nickName : guestsTokens.keySet()) {
-            System.out.println("token : " + token);
             if (guestsTokens.get(nickName).equals(token)) {
                 Guest guest = guestRepository.findByNickName(nickName);
                 if (guest.isMuted())
@@ -332,27 +286,16 @@ public class UserService {
         return false;
     }
 
-
     public User getUserById(String id) {
-        System.out.println(id);
-        Gson g = new Gson();
-        Token t = g.fromJson(id, Token.class);
-        System.out.println(t);
-        User result = userRepository.findUserById(Integer.valueOf(t.getToken()));
+        String myId = convertToken(id, Token.class);
+        User result = userRepository.findUserById(Integer.valueOf(myId));
         return result;
     }
 
+    private String convertToken(String token, Class<?> c) {
+        Gson g = new Gson();
+        Token t = g.fromJson(token, Token.class);
+        return t.getToken();
+    }
 
-//    public boolean addForTest(SubmitedUser user) throws NoSuchAlgorithmException {
-//        if (user == null) {
-//            return false;
-//        }
-//
-//        User myUser = new User.Builder(user.getEmail(), ValidationUtils.secretPassword(user.getPassword()), user.getNickName()).build();
-//        if (userRepository.save(myUser) != null) {
-//            EmailActivation.sendSuccessRegisterationMessageToUser(user);
-//            return true;
-//        }
-//        return false;
-//    }
 }
