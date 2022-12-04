@@ -39,7 +39,12 @@ public class UserService {
         guestsTokens = new HashMap<>();
     }
 
-
+    /**
+     * Function checks if user is registered in the db or not .
+     *
+     * @param user
+     * @return
+     */
     public boolean isUserRegistered(SubmitedUser user) {
         if (userRepository.findByEmail(user.getEmail()) != null)
             throw new IllegalArgumentException(String.format("Email \" %s \" is Already Exist!", user.getEmail()));
@@ -91,10 +96,22 @@ public class UserService {
         return null;
     }
 
+    /**
+     * Function that gets all the users of the db .
+     *
+     * @return
+     */
     public List<Guest> getAllGuests() {
         return guestRepository.findAll();
     }
 
+    /**
+     * Function to add guest to the db after validations .
+     *
+     * @param SubmittedGuest
+     * @return
+     * @throws IllegalArgumentException
+     */
     public String addGuest(Guest SubmittedGuest) throws IllegalArgumentException {
         if (guestRepository.findByNickName(SubmittedGuest.getNickName()) != null)
             throw new IllegalArgumentException(String.format("Nickname %s exists in guests table", SubmittedGuest.getNickName()));
@@ -110,6 +127,14 @@ public class UserService {
         return null;
     }
 
+    /**
+     * Function to let user make login operation .
+     *
+     * @param user
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws IllegalArgumentException
+     */
     public String login(SubmitedUser user) throws NoSuchAlgorithmException, IllegalArgumentException {
         if (isUserValid(user)) {
             int userId = userRepository.findByEmail(user.getEmail()).getId();
@@ -121,10 +146,26 @@ public class UserService {
         return null;
     }
 
+    /**
+     * Function that checks if user is valid - has an email in db and a fit password .
+     *
+     * @param user
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws IllegalArgumentException
+     */
     private boolean isUserValid(SubmitedUser user) throws NoSuchAlgorithmException, IllegalArgumentException {
         return isUserExistedAndPasswordIsFit(user);
     }
 
+    /**
+     * Helper to the function that check validation of the user .
+     *
+     * @param user
+     * @return
+     * @throws IllegalArgumentException
+     * @throws NoSuchAlgorithmException
+     */
     private boolean isUserExistedAndPasswordIsFit(SubmitedUser user) throws IllegalArgumentException, NoSuchAlgorithmException {
         User myUser = userRepository.findByEmail(user.getEmail());
 
@@ -162,7 +203,12 @@ public class UserService {
         return false;
     }
 
-
+    /**
+     * Function that deletes guest from the db , and deletes his token .
+     *
+     * @param token
+     * @return
+     */
     public boolean logoutGuest(String token) {
 
         String myToken = convertToken(token, Token.class);
@@ -180,10 +226,20 @@ public class UserService {
         return false;
     }
 
+    /**
+     * get list of all the guests .
+     *
+     * @return
+     */
     public List<Guest> getGuestList() {
         return guestRepository.findAll();
     }
 
+    /**
+     * get list of all the users .
+     *
+     * @return
+     */
     public List<User> getUserList() {
         List<User> userList = userRepository.findAll();
         List<User> res = new ArrayList<>();
@@ -195,6 +251,12 @@ public class UserService {
         return res;
     }
 
+    /**
+     * get user of db by his token if existed .
+     *
+     * @param token
+     * @return
+     */
     public User getUserByToken(String token) {
         Integer myid = -1;
 
@@ -206,7 +268,13 @@ public class UserService {
         return result;
     }
 
-
+    /**
+     * mute user .
+     *
+     * @param token
+     * @param id
+     * @return
+     */
     public Response mute(String token, String id) {
         if (isAdmin(token)) {
             int i = Integer.parseInt(id);
@@ -217,6 +285,13 @@ public class UserService {
         return new Response(404, "Can't mute user!");
     }
 
+    /**
+     * unmute guest .
+     *
+     * @param token
+     * @param nickName
+     * @return
+     */
     public Response muteGuest(String token, String nickName) {
         if (isAdmin(token)) {
             guestRepository.mute(nickName);
@@ -226,6 +301,13 @@ public class UserService {
         return new Response(404, "Can't mute user!");
     }
 
+    /**
+     * unMute user .
+     *
+     * @param token
+     * @param id
+     * @return
+     */
     public Response unMute(String token, String id) {
         if (isAdmin(token)) {
             int i = Integer.parseInt(id);
@@ -236,7 +318,13 @@ public class UserService {
         return new Response(404, "Can't unmute user!");
     }
 
-
+    /**
+     * unmute guest .
+     *
+     * @param token
+     * @param nickName
+     * @return
+     */
     public Response unmuteGuest(String token, String nickName) {
         if (isAdmin(token)) {
             guestRepository.unMute(nickName);
@@ -246,6 +334,12 @@ public class UserService {
         return new Response(404, "Can't unmute user!");
     }
 
+    /**
+     * check if user is admin .
+     *
+     * @param token
+     * @return
+     */
     private boolean isAdmin(String token) {
 
         String mytoken = convertToken(token, Token.class);
@@ -257,7 +351,12 @@ public class UserService {
         return false;
     }
 
-
+    /**
+     * general function to check is user/guest is muted .
+     *
+     * @param token
+     * @return
+     */
     public boolean isUserMuted(String token) {
         if (isRegisteredUserMuted(token) || isGuestMuted(token))
             return true;
@@ -265,6 +364,12 @@ public class UserService {
         return false;
     }
 
+    /**
+     * checks if registered user is muted or not .
+     *
+     * @param token
+     * @return
+     */
     private boolean isRegisteredUserMuted(String token) {
         User user = getUserByToken(token);
 
@@ -275,6 +380,12 @@ public class UserService {
         return false;
     }
 
+    /**
+     * checks if guest is muted or not .
+     *
+     * @param token
+     * @return
+     */
     private boolean isGuestMuted(String token) {
         for (String nickName : guestsTokens.keySet()) {
             if (guestsTokens.get(nickName).equals(token)) {
@@ -286,12 +397,25 @@ public class UserService {
         return false;
     }
 
+    /**
+     * get user from db by his id .
+     *
+     * @param id
+     * @return
+     */
     public User getUserById(String id) {
         String myId = convertToken(id, Token.class);
         User result = userRepository.findUserById(Integer.valueOf(myId));
         return result;
     }
 
+    /**
+     * converts token from object to string .
+     *
+     * @param token
+     * @param c
+     * @return
+     */
     private String convertToken(String token, Class<?> c) {
         Gson g = new Gson();
         Token t = g.fromJson(token, Token.class);

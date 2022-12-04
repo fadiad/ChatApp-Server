@@ -29,6 +29,13 @@ public class ChatController {
         return new RecievedMessage("SYSTEM", message.getName() + "joined the chat");
     }
 
+    /**
+     * routing socet of the main chat room .
+     *
+     * @param message
+     * @return
+     */
+
     @MessageMapping("/plain")
     @SendTo("/topic/mainChat")
     public RecievedMessage sendPlainMessage(RecievedMessage message) {
@@ -44,6 +51,12 @@ public class ChatController {
         return null;
     }
 
+    /**
+     * routing socet of private chat .
+     *
+     * @param message
+     * @return
+     */
     @MessageMapping("/private-message")
     public RecievedMessage sendPlainMessagePrivate(@Payload RecievedMessage message) {
 

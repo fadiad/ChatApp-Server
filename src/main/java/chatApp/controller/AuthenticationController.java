@@ -104,6 +104,12 @@ public class AuthenticationController {
 
     }
 
+    /**
+     * logout for guest router .
+     * @param token
+     * @return
+     */
+
     @RequestMapping(value = "logoutGuest", method = RequestMethod.POST)
     public ResponseEntity<String> logoutGuest(@RequestBody String token) {
         if (!userService.logoutGuest(token))
