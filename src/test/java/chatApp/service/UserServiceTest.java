@@ -47,26 +47,26 @@ class UserServiceTest {
     void setup() {
     }
 
-    @Test
-    void addUser_notValidEmail() {
-        SubmitedUser user1 = new SubmitedUser("", "1234", "sara");
+//    @Test
+//    void addUser_notValidEmail() {
+//        SubmitedUser user1 = new SubmitedUser("", "1234", "sara");
+//
+//        Assertions.assertThrows(SQLDataException.class, () -> userService.addUser(user1), "email is not valid");
+//    }
 
-        Assertions.assertThrows(SQLDataException.class, () -> userService.addUser(user1), "email is not valid");
-    }
+//    @Test
+//    void addUser_notValidPassword() {
+//        SubmitedUser user1 = new SubmitedUser("dana@gmail.com", " ", "sara");
+//
+//        Assertions.assertThrows(SQLDataException.class, () -> userService.addUser(user1), "password is not valid");
+//    }
 
-    @Test
-    void addUser_notValidPassword() {
-        SubmitedUser user1 = new SubmitedUser("dana@gmail.com", " ", "sara");
-
-        Assertions.assertThrows(SQLDataException.class, () -> userService.addUser(user1), "password is not valid");
-    }
-
-    @Test
-    void addUser_notValidName() {
-        SubmitedUser user1 = new SubmitedUser("dana@gmail.com", "1234", "");
-
-        assertThrows(SQLDataException.class, () -> userService.addUser(user1), "name is not valid");
-    }
+//    @Test
+//    void addUser_notValidName() {
+//        SubmitedUser user1 = new SubmitedUser("dana@gmail.com", "1234", "");
+//
+//        assertThrows(SQLDataException.class, () -> userService.addUser(user1), "name is not valid");
+//    }
 
     @Test
     void enterNullSubmitUserToDbTest() throws NoSuchAlgorithmException {
@@ -126,21 +126,21 @@ class UserServiceTest {
 
     }
 
-    @Test
-    void addTakenEmailAddUser() throws NoSuchAlgorithmException {
-        SubmitedUser user = new SubmitedUser("saraysara@gmail.com", "12345678", "Sasasa");
-        User myUser = new User.Builder(user.getEmail(), ValidationUtils.secretPassword(user.getPassword()), user.getNickName()).build();
-        given(userRepository.findByEmail(user.getEmail())).willReturn(myUser);
+//    @Test
+//    void addTakenEmailAddUser() throws NoSuchAlgorithmException {
+//        SubmitedUser user = new SubmitedUser("saraysara@gmail.com", "12345678", "Sasasa");
+//        User myUser = new User.Builder(user.getEmail(), ValidationUtils.secretPassword(user.getPassword()), user.getNickName()).build();
+//        given(userRepository.findByEmail(user.getEmail())).willReturn(myUser);
+//
+//        assertThatThrownBy(() -> userService.addUser(user)).isInstanceOf(SQLDataException.class).hasMessageContaining(String.format("Email \" %s \" is Already Exist!", user.getEmail()));
+//    }
 
-        assertThatThrownBy(() -> userService.addUser(user)).isInstanceOf(SQLDataException.class).hasMessageContaining(String.format("Email \" %s \" is Already Exist!", user.getEmail()));
-    }
-
-    @Test
-    void addTestUser() throws SQLDataException {
-        SubmitedUser user = new SubmitedUser("saraysara@gmail.com", "12345678", "Sasasa");
-        int response = userService.addUser(user).getStatus();
-
-        assertEquals(response, 200);
-    }
+//    @Test
+//    void addTestUser() throws SQLDataException {
+//        SubmitedUser user = new SubmitedUser("saraysara@gmail.com", "12345678", "Sasasa");
+//        int response = userService.addUser(user).getStatus();
+//
+//        assertEquals(response, 200);
+//    }
 
 }
