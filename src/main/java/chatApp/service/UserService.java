@@ -6,7 +6,6 @@ import chatApp.repository.GuestRepository;
 import chatApp.repository.UserRepository;
 import chatApp.util.EmailActivation;
 import chatApp.util.ValidationUtils;
-import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -189,7 +188,7 @@ public class UserService {
      */
     public boolean logout(String token) {
 
-        String myToken = convertToken(token, Token.class);
+        String myToken = ValidationUtils.convertToken(token, Token.class);
 
         if (ValidationUtils.isNumeric(myToken)) {
             User user = getUserByToken(myToken);
@@ -211,7 +210,7 @@ public class UserService {
      */
     public boolean logoutGuest(String token) {
 
-        String myToken = convertToken(token, Token.class);
+        String myToken = ValidationUtils.convertToken(token, Token.class);
 
         for (String nickName : guestsTokens.keySet()) {
             if (guestsTokens.get(nickName).equals(myToken)) {
@@ -342,7 +341,7 @@ public class UserService {
      */
     private boolean isAdmin(String token) {
 
-        String mytoken = convertToken(token, Token.class);
+        String mytoken = ValidationUtils.convertToken(token, Token.class);
         User user = getUserByToken(mytoken);
 
         if (user.getRole() == 1)
@@ -404,22 +403,9 @@ public class UserService {
      * @return
      */
     public User getUserById(String id) {
-        String myId = convertToken(id, Token.class);
+        String myId = ValidationUtils.convertToken(id, Token.class);
         User result = userRepository.findUserById(Integer.valueOf(myId));
         return result;
-    }
-
-    /**
-     * converts token from object to string .
-     *
-     * @param token
-     * @param c
-     * @return
-     */
-    private String convertToken(String token, Class<?> c) {
-        Gson g = new Gson();
-        Token t = g.fromJson(token, Token.class);
-        return t.getToken();
     }
 
 }
