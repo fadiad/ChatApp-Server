@@ -31,6 +31,7 @@ public class UserController {
     private ChatService chatService;
 
 
+
     /**
      * @param user details.
      * @return update the user profile.
@@ -113,14 +114,14 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(newList); //list with all message of the "id" room.
     }
 
-    public SubmitedUser addUserForTestToDB() throws NoSuchAlgorithmException {
-        SubmitedUser user = new SubmitedUser("saraysara1996@gmail.com", "12345", "Saray");
-        User myUser = new User.Builder(user.getEmail(), ValidationUtils.secretPassword(user.getPassword()), user.getNickName()).build();
-        if (userService.addForTest(user)) {
-            return user;
-        }
-        return null;
-    }
+//    public SubmitedUser addUserForTestToDB() throws NoSuchAlgorithmException {
+//        SubmitedUser user = new SubmitedUser("saraysara1996@gmail.com", "12345", "Saray");
+//        User myUser = new User.Builder(user.getEmail(), ValidationUtils.secretPassword(user.getPassword()), user.getNickName()).build();
+//        if (userService.addForTest(user)) {
+//            return user;
+//        }
+//        return null;
+//    }
 
     public String addGuestForTestToDB() throws SQLDataException {
         SubmitedUser user = new SubmitedUser(" ", " ", "Saraa");

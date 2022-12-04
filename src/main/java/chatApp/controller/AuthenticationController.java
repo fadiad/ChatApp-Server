@@ -4,9 +4,11 @@ package chatApp.controller;
 import chatApp.Entities.Guest;
 import chatApp.Entities.Response;
 import chatApp.Entities.SubmitedUser;
+import chatApp.Entities.ActiveUser;
+import chatApp.service.ActivateService;
 import chatApp.service.UserService;
+import chatApp.util.EmailActivation;
 import chatApp.util.ValidationUtils;
-import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
-import java.sql.SQLDataException;
 
 @RestController
 @CrossOrigin
@@ -25,6 +26,9 @@ public class AuthenticationController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ActivateService activateService;
 
     /**
      * @param user details
@@ -72,11 +76,26 @@ public class AuthenticationController {
      */
     @RequestMapping(value = "signup", method = RequestMethod.POST)
     public ResponseEntity<String> createUser(@RequestBody SubmitedUser user) throws IllegalArgumentException {
-        Response response = userService.addUser(user); //It is a user need to send full user
-        Gson g = new Gson();
+        if (!ValidationUtils.validateEmail(user.getEmail()))
+            throw new IllegalArgumentException(String.format("Email \" %s \" is not valid!", user.getEmail()));
+
+        if (!ValidationUtils.validatePassword(user.getPassword()))
+            throw new IllegalArgumentException(String.format("Password \" %s \" is not valid!", user.getPassword()));
+
+        if (!ValidationUtils.validateName(user.getNickName()))
+            throw new IllegalArgumentException(String.format("Nickname \" %s \" is not valid!", user.getNickName()));
+
+        String myCode = ValidationUtils.generateRandomToken();
+        System.out.println("myCode: "+myCode);
+        ActiveUser activeU = new ActiveUser(user.getEmail(), user.getPassword(), user.getNickName(), myCode);
+
+        EmailActivation.sendEmailWithGenerateCode(myCode,activeU);
+
+        Boolean response = activateService.keepOnDB(activeU);
+
         return ResponseEntity
-                .status(response.getStatus())
-                .body(g.toJson(response.getMessage()));
+                .status(200)
+                .body("added to dataBase for activation users");
     }
 
     @RequestMapping(value = "logoutGuest", method = RequestMethod.POST)

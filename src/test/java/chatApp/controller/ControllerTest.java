@@ -45,6 +45,7 @@ class ControllerTest {
         assertEquals(200, r.getStatusCodeValue());
     }
 
+
 //    @Test
 //    public void login_User_Successfully() throws SQLDataException, NoSuchAlgorithmException {
 //        userController.addUserForTestToDB(); //add user to DB for test only// saray
@@ -70,6 +71,7 @@ class ControllerTest {
 //
 //        assertTrue(200 == 200);
 //    }
+
 
 //    @Test
 //    public void create_User_Successfully() throws SQLDataException {
