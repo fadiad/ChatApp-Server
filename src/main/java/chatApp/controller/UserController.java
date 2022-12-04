@@ -34,10 +34,10 @@ public class UserController {
     /**
      * @param user details.
      * @return update the user profile.
-     * @throws SQLDataException if one of the details not valid.
+     * @throws IllegalArgumentException if one of the details not valid.
      */
     @RequestMapping(value = "saveProfile", method = RequestMethod.POST)
-    public ResponseEntity<String> saveProfile(@RequestBody User user) throws SQLDataException {
+    public ResponseEntity<String> saveProfile(@RequestBody User user) throws IllegalArgumentException {
 
         System.out.println("in controller: " + user);
         Response response = userService.saveProfile(user);

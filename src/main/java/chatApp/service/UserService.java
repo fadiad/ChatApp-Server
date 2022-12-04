@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.NoSuchAlgorithmException;
-import java.sql.SQLDataException;
 import java.util.*;
 
 @Service
@@ -43,21 +42,21 @@ public class UserService {
      *
      * @param user - the user's data
      * @return a saved user with it's generated id
-     * @throws SQLDataException when the provided email already exists
+     * @throws IllegalArgumentException when the provided email already exists
      */
-    public Response addUser(SubmitedUser user) throws SQLDataException {
+    public Response addUser(SubmitedUser user) throws IllegalArgumentException {
 
         if (!ValidationUtils.validateEmail(user.getEmail()))
-            throw new SQLDataException(String.format("Email \" %s \" is not valid!", user.getEmail()));
+            throw new IllegalArgumentException(String.format("Email \" %s \" is not valid!", user.getEmail()));
 
         if (!ValidationUtils.validatePassword(user.getPassword()))
-            throw new SQLDataException(String.format("Password \" %s \" is not valid!", user.getPassword()));
+            throw new IllegalArgumentException(String.format("Password \" %s \" is not valid!", user.getPassword()));
 
         if (!ValidationUtils.validateName(user.getNickName()))
-            throw new SQLDataException(String.format("Nickname \" %s \" is not valid!", user.getNickName()));
+            throw new IllegalArgumentException(String.format("Nickname \" %s \" is not valid!", user.getNickName()));
 
         if (userRepository.findByEmail(user.getEmail()) != null)
-            throw new SQLDataException(String.format("Email \" %s \" is Already Exist!", user.getEmail()));
+            throw new IllegalArgumentException(String.format("Email \" %s \" is Already Exist!", user.getEmail()));
 
         String code = ValidationUtils.generateRandomToken();
         useresCode.put(code, user);
@@ -72,16 +71,16 @@ public class UserService {
      *
      * @param user - the user's data
      * @return a saved user with it's generated id
-     * @throws SQLDataException when the provided email already exists
+     * @throws IllegalArgumentException when the provided email already exists
      */
-    public Response saveProfile(User user) throws SQLDataException {
+    public Response saveProfile(User user) throws IllegalArgumentException {
 
         if (!ValidationUtils.validateName(user.getNickName()))
-            throw new SQLDataException(String.format("Nickname \" %s \" is not valid!", user.getNickName()));
+            throw new IllegalArgumentException(String.format("Nickname \" %s \" is not valid!", user.getNickName()));
         if (!ValidationUtils.validateName(user.getFirstName()))
-            throw new SQLDataException(String.format("First Name \" %s \" is not valid!", user.getFirstName()));
+            throw new IllegalArgumentException(String.format("First Name \" %s \" is not valid!", user.getFirstName()));
         if (!ValidationUtils.validateName(user.getLastName()))
-            throw new SQLDataException(String.format("Last Name \" %s \" is not valid!", user.getLastName()));
+            throw new IllegalArgumentException(String.format("Last Name \" %s \" is not valid!", user.getLastName()));
         System.out.println("new profile :" + user);
         user.setPassword(userRepository.findByEmail(user.getEmail()).getPassword());
         user.setRole(userRepository.findByEmail(user.getEmail()).getRole());
@@ -95,7 +94,7 @@ public class UserService {
     }
 
 
-    public Response enterUserToDB(String code) throws NoSuchAlgorithmException {
+    public Response enterUserToDB(String code) throws NoSuchAlgorithmException,IllegalArgumentException {
         SubmitedUser user = useresCode.get(code);
 
         if (user == null) {
@@ -115,10 +114,10 @@ public class UserService {
         return guestRepository.findAll();
     }
 
-    public String addGuest(Guest SubmittedGuest) throws SQLDataException {
+    public String addGuest(Guest SubmittedGuest) throws IllegalArgumentException {
         if (guestRepository.findByNickName(SubmittedGuest.getNickName()) != null) {
             System.out.println(String.format("Nickname %s exists in guests table", SubmittedGuest.getNickName()));
-            throw new SQLDataException(String.format("Nickname %s exists in guests table", SubmittedGuest.getNickName()));
+            throw new IllegalArgumentException(String.format("Nickname %s exists in guests table", SubmittedGuest.getNickName()));
         }
 
         Guest savedGuest = guestRepository.save(SubmittedGuest);
@@ -135,7 +134,7 @@ public class UserService {
     /*
      * we can get user once
      */
-    public String login(SubmitedUser user) throws NoSuchAlgorithmException {
+    public String login(SubmitedUser user) throws NoSuchAlgorithmException , IllegalArgumentException{
         System.out.println("user in login fun : " + user);
         if (isUserValid(user)) {
             int userId = userRepository.findByEmail(user.getEmail()).getId();
@@ -149,11 +148,11 @@ public class UserService {
         return null;
     }
 
-    private boolean isUserValid(SubmitedUser user) throws NoSuchAlgorithmException {
+    private boolean isUserValid(SubmitedUser user) throws NoSuchAlgorithmException, IllegalArgumentException {
         return isUserExistedAndPasswordIsFit(user);
     }
 
-    private boolean isUserExistedAndPasswordIsFit(SubmitedUser user) throws NoSuchAlgorithmException {
+    private boolean isUserExistedAndPasswordIsFit(SubmitedUser user) throws IllegalArgumentException, NoSuchAlgorithmException {
         User myUser = userRepository.findByEmail(user.getEmail());
         if (myUser == null)
             return false;
