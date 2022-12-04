@@ -1,6 +1,9 @@
 package chatApp.util;
 
 import chatApp.Entities.SubmitedUser;
+import chatApp.Entities.Token;
+import com.google.gson.Gson;
+
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -92,5 +95,19 @@ public class ValidationUtils {
             hexString.insert(0, '0');
         }
         return hexString.toString();
+    }
+
+
+    /**
+     * converts token from object to string .
+     *
+     * @param token
+     * @param c
+     * @return
+     */
+    public static String convertToken(String token, Class<?> c) {
+        Gson g = new Gson();
+        Token t = g.fromJson(token, Token.class);
+        return t.getToken();
     }
 }
