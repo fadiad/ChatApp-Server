@@ -34,10 +34,10 @@ public class UserController {
     /**
      * @param user details
      * @return check validations and return the token of the user if he succeeded to log in
-     * @throws SQLDataException validations problems
+     * @throws IllegalArgumentException validations problems
      */
     @RequestMapping(value = "login", method = RequestMethod.POST)
-    public ResponseEntity<Object> login(@RequestBody SubmitedUser user) throws SQLDataException, NoSuchAlgorithmException {
+    public ResponseEntity<Object> login(@RequestBody SubmitedUser user) throws IllegalArgumentException, NoSuchAlgorithmException {
         System.out.println("------------Registered User login-------------");
         System.out.println(user);
         String token = "";
@@ -49,7 +49,7 @@ public class UserController {
 
         if (token == null || token.isEmpty()){
             logger.error("email or password not correct");
-            throw new SQLDataException(String.format("email or password is not correct !"));
+            throw new IllegalArgumentException(String.format("email or password is not correct !"));
 
         }
 
@@ -60,10 +60,10 @@ public class UserController {
     /**
      * @param user of a guest
      * @return save the guest and the token
-     * @throws SQLDataException validations problems
+     * @throws IllegalArgumentException validations problems
      */
     @RequestMapping(value = "loginGuest", method = RequestMethod.POST) //TODO: problem
-    public ResponseEntity<String> loginGuest(@RequestBody SubmitedUser user) throws SQLDataException {
+    public ResponseEntity<String> loginGuest(@RequestBody SubmitedUser user) throws IllegalArgumentException {
         System.out.println("------------guest login-------------");
         if (ValidationUtils.guestValidation(user)) {
             Guest guest = new Guest(user.getNickName());
@@ -72,17 +72,17 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body(userService.addGuest(guest));
         }
         logger.error("Exception, nickName not valid (length name)");
-        throw new SQLDataException(String.format("Nickname \" %s \" is not valid!", user.getNickName()));
+        throw new IllegalArgumentException(String.format("Nickname \" %s \" is not valid!", user.getNickName()));
     }
 
     /**
      * @param user details
      * @return check the user details, validation, and send a email with code,
      * then, keep him on map until he activates his email.
-     * @throws SQLDataException if there is a validated problems
+     * @throws IllegalArgumentException if there is a validated problems
      */
     @RequestMapping(value = "signup", method = RequestMethod.POST)
-    public ResponseEntity<String> createUser(@RequestBody SubmitedUser user) throws SQLDataException {
+    public ResponseEntity<String> createUser(@RequestBody SubmitedUser user) throws IllegalArgumentException {
         Response response = userService.addUser(user); //It is a user need to send full user
         Gson g = new Gson();
         return ResponseEntity
@@ -94,10 +94,10 @@ public class UserController {
     /**
      * @param user details.
      * @return update the user profile.
-     * @throws SQLDataException if one of the details not valid.
+     * @throws IllegalArgumentException if one of the details not valid.
      */
     @RequestMapping(value = "saveProfile", method = RequestMethod.POST)
-    public ResponseEntity<String> saveProfile(@RequestBody User user) throws SQLDataException {
+    public ResponseEntity<String> saveProfile(@RequestBody User user) throws IllegalArgumentException {
 
         System.out.println("in controller: " + user);
         Response response = userService.saveProfile(user);

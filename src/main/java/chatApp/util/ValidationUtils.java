@@ -97,7 +97,7 @@ public class ValidationUtils {
         int token = ThreadLocalRandom.current().nextInt(1, Integer.MAX_VALUE);
         return String.valueOf(token);
     }
-    public static String secretPassword(String password) throws NoSuchAlgorithmException {
+    public static String secretPassword(String password) throws IllegalArgumentException, NoSuchAlgorithmException {
         return toHexString(getSHA(password));
     }
     private static byte[] getSHA(String input) throws NoSuchAlgorithmException {
