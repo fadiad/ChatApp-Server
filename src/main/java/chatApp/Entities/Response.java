@@ -1,7 +1,5 @@
 package chatApp.Entities;
 
-import java.util.List;
-
 public class Response {
     private String message;
     private int status;

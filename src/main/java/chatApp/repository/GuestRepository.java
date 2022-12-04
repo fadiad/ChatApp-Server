@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 import javax.transaction.Transactional;
 
 @Repository
-//@EnableJpaRepositories
 public interface GuestRepository extends JpaRepository<Guest, String> {
     Guest findByNickName(String nickName);
 

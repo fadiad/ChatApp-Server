@@ -1,12 +1,13 @@
 package chatApp.controller;
 
-
 import chatApp.Entities.Guest;
 import chatApp.Entities.Response;
 import chatApp.Entities.SubmitedUser;
+import chatApp.Entities.ActiveUser;
+import chatApp.service.ActivateService;
 import chatApp.service.UserService;
+import chatApp.util.EmailActivation;
 import chatApp.util.ValidationUtils;
-import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
-import java.sql.SQLDataException;
 
 @RestController
 @CrossOrigin
@@ -26,6 +26,9 @@ public class AuthenticationController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private ActivateService activateService;
+
     /**
      * @param user details
      * @return check validations and return the token of the user if he succeeded to log in
@@ -33,13 +36,10 @@ public class AuthenticationController {
      */
     @RequestMapping(value = "login", method = RequestMethod.POST)
     public ResponseEntity<Object> login(@RequestBody SubmitedUser user) throws IllegalArgumentException, NoSuchAlgorithmException {
-        System.out.println("------------Registered User login-------------");
-        System.out.println(user);
         String token = "";
 
-        if (ValidationUtils.loginUserValidation(user)) {
+        if (ValidationUtils.loginUserValidation(user))
             token = userService.login(user);
-        }
 
         if (token == null)
             throw new IllegalArgumentException(String.format("email or password is not correct !"));
@@ -55,11 +55,12 @@ public class AuthenticationController {
      */
     @RequestMapping(value = "loginGuest", method = RequestMethod.POST)
     public ResponseEntity<Object> loginGuest(@RequestBody SubmitedUser user) throws IllegalArgumentException {
-        System.out.println("------------guest login-------------");
+
         if (ValidationUtils.guestValidation(user)) {
             Guest guest = new Guest(user.getNickName());
             return ResponseEntity.status(HttpStatus.OK).body(userService.addGuest(guest));
         }
+
         throw new IllegalArgumentException(String.format("Nickname \" %s \" is not valid!", user.getNickName()));
     }
 
@@ -72,11 +73,35 @@ public class AuthenticationController {
      */
     @RequestMapping(value = "signup", method = RequestMethod.POST)
     public ResponseEntity<String> createUser(@RequestBody SubmitedUser user) throws IllegalArgumentException {
-        Response response = userService.addUser(user); //It is a user need to send full user
-        Gson g = new Gson();
+        if (!ValidationUtils.validateEmail(user.getEmail()))
+            throw new IllegalArgumentException(String.format("Email \" %s \" is not valid!", user.getEmail()));
+
+        if (!ValidationUtils.validatePassword(user.getPassword()))
+            throw new IllegalArgumentException(String.format("Password \" %s \" is not valid!", user.getPassword()));
+
+        if (!ValidationUtils.validateName(user.getNickName()))
+            throw new IllegalArgumentException(String.format("Nickname \" %s \" is not valid!", user.getNickName()));
+
+
+        if (!userService.isUserRegistered(user)) {
+
+            String myCode = ValidationUtils.generateRandomToken();
+
+            ActiveUser activeU = new ActiveUser(user.getEmail(), user.getPassword(), user.getNickName(), myCode);
+
+            EmailActivation.sendEmailWithGenerateCode(myCode, activeU);
+
+            Boolean response = activateService.keepOnDB(activeU);
+
+            return ResponseEntity
+                    .status(200)
+                    .body("added to dataBase for activation users");
+        }
+
         return ResponseEntity
-                .status(response.getStatus())
-                .body(g.toJson(response.getMessage()));
+                .status(400)
+                .body("User is already existed !");
+
     }
 
     @RequestMapping(value = "logoutGuest", method = RequestMethod.POST)
@@ -88,6 +113,7 @@ public class AuthenticationController {
 
         return ResponseEntity.ok("logout done successfully");
     }
+
     /**
      * @param token of the online user
      * @return response 200 if he found the token in the map, he log out the user. else error
@@ -110,8 +136,7 @@ public class AuthenticationController {
      */
     @RequestMapping(value = "activate", method = RequestMethod.GET)
     public ResponseEntity<Object> activateEmail(@RequestParam String code) throws NoSuchAlgorithmException {
-        System.out.println("------------Activate account after login-------------");
-        System.out.println(code);
+
         Response response = userService.enterUserToDB(code);
 
         return ResponseEntity

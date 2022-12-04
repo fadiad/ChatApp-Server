@@ -25,7 +25,6 @@ public class ChatService {
                 .filter(message -> message.getChatId().equals(chatId))
                 .sorted(Comparator.comparing(ChatMessage::getDateMessage))
                 .collect(Collectors.toList());
-        System.out.println("list : " + list);
 
         return list;
     }
@@ -36,13 +35,13 @@ public class ChatService {
 
 
     public List<ChatMessage> allMessageBetween_A_B(String sender, String destination) {
-        List<ChatMessage> allMessage = massegeRepository.findAll(); //all messages
-        List<ChatMessage> newChat = null; //new null list
-        for (ChatMessage lst : allMessage) { //foreach
-            if (lst.getSender() == sender && lst.getChatId() == destination) {
+        List<ChatMessage> allMessage = massegeRepository.findAll();
+        List<ChatMessage> newChat = null;
+
+        for (ChatMessage lst : allMessage)
+            if (lst.getSender() == sender && lst.getChatId() == destination)
                 newChat.add(lst);
-            }
-        }
+
         return newChat;
     }
 }
