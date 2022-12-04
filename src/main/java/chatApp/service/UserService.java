@@ -94,7 +94,7 @@ public class UserService {
     }
 
 
-    public Response enterUserToDB(String code) throws NoSuchAlgorithmException,IllegalArgumentException {
+    public Response enterUserToDB(String code) throws NoSuchAlgorithmException, IllegalArgumentException {
         SubmitedUser user = useresCode.get(code);
 
         if (user == null) {
@@ -134,7 +134,7 @@ public class UserService {
     /*
      * we can get user once
      */
-    public String login(SubmitedUser user) throws NoSuchAlgorithmException , IllegalArgumentException{
+    public String login(SubmitedUser user) throws NoSuchAlgorithmException, IllegalArgumentException {
         System.out.println("user in login fun : " + user);
         if (isUserValid(user)) {
             int userId = userRepository.findByEmail(user.getEmail()).getId();
@@ -168,15 +168,12 @@ public class UserService {
      * If the token is numeric it means it's a registered user ,else if it's not , so he is a guest and it's his name .
      */
     public boolean logout(String token) {
-        Gson g = new Gson();
-        Token t = g.fromJson(token, Token.class);
-        String mytoken = t.getToken();
-        System.out.println(mytoken);
 
+        String myToken = convertToken(token, Token.class);
 
-        if (ValidationUtils.isNumeric(mytoken)) {
+        if (ValidationUtils.isNumeric(myToken)) {
             for (int id : usersTokens.keySet())
-                if (usersTokens.get(id).equals(mytoken)) {
+                if (usersTokens.get(id).equals(myToken)) {
                     usersTokens.remove(id);
                     userRepository.updateUserSetStatusForId("offline", id);
                     return true;
@@ -184,21 +181,16 @@ public class UserService {
             return false;
         }
         return false;
-
     }
 
 
     public boolean logoutGuest(String token) {
         System.out.println("---------logout Guest---------");
-        System.out.println(token);
-        Gson g = new Gson();
-        Token t = g.fromJson(token, Token.class);
-        System.out.println(t);
-        System.out.println(t.getToken());
 
+        String myToken = convertToken(token, Token.class);
 
         for (String nickName : guestsTokens.keySet()) {
-            if (guestsTokens.get(nickName).equals(t.getToken())) {
+            if (guestsTokens.get(nickName).equals(myToken)) {
                 int delresult = guestRepository.deleteUserByNickName(nickName);
                 if (delresult > 0) {
                     guestsTokens.remove(nickName);
@@ -218,7 +210,7 @@ public class UserService {
         List<User> userList = userRepository.findAll();
         List<User> res = new ArrayList<>();
         for (User u : userList) {
-            if (!Objects.equals(u.getStatus(), "offline"))////////////////
+            if (!Objects.equals(u.getStatus(), "offline"))
                 res.add(u);
         }
         return res;
@@ -226,8 +218,6 @@ public class UserService {
 
     public User getUserByToken(String token) {
         Integer myid = -1;
-//        Gson g = new Gson();
-//        Token t = g.fromJson(token, Token.class);
 
         for (Integer key : usersTokens.keySet()) {
             if (usersTokens.get(key).equals(token))
@@ -243,7 +233,6 @@ public class UserService {
         if (isAdmin(token)) {
             int i = Integer.parseInt(id);
             userRepository.mute(i);
-            System.out.println("user after muting" + userRepository.findAll());
             return new Response(200, "User is muted!");
         }
 
@@ -254,7 +243,7 @@ public class UserService {
         System.out.println("----------muteGuest---------");
         if (isAdmin(token)) {
             guestRepository.mute(nickName);
-            System.out.println("user after muting" + guestRepository.findAll());
+            System.out.println("User is muted!");
             return new Response(200, "User is muted!");
         }
 
@@ -266,7 +255,6 @@ public class UserService {
         if (isAdmin(token)) {
             int i = Integer.parseInt(id);
             userRepository.unMute(i);
-            System.out.println("user after unMuting" + userRepository.findAll());
             return new Response(200, "User is un muted!");
         }
         return new Response(404, "Can't unmute user!");
@@ -277,7 +265,6 @@ public class UserService {
         System.out.println("----------unmuteGuest---------");
         if (isAdmin(token)) {
             guestRepository.unMute(nickName);
-            System.out.println("user after unMuting" + guestRepository.findAll());
             return new Response(200, "User is un muted!");
         }
         return new Response(404, "Can't unmute user!");
@@ -286,18 +273,11 @@ public class UserService {
     private boolean isAdmin(String token) {
         System.out.println("usersTokens = " + usersTokens);
 
-        Gson g = new Gson();
-        Token t = g.fromJson(token, Token.class);
-        String mytoken = t.getToken();
+        String mytoken = convertToken(token, Token.class);
+        User user = getUserByToken(mytoken);
+        if (user.getRole() == 1)
+            return true;
 
-        for (int id : usersTokens.keySet()) {
-            if (usersTokens.get(id).equals(mytoken)) {
-                User user = userRepository.findUserById(id);
-                if (user.getRole() == 1)
-                    return true;
-            }
-        }
-        System.out.println("not admin");
         return false;
     }
 
@@ -329,6 +309,7 @@ public class UserService {
             System.out.println("token : " + token);
             if (guestsTokens.get(nickName).equals(token)) {
                 Guest guest = guestRepository.findByNickName(nickName);
+                System.out.println("guest : " + guest);
                 if (guest.isMuted())
                     return true;
             }
@@ -338,11 +319,9 @@ public class UserService {
 
 
     public User getUserById(String id) {
-        System.out.println(id);
-        Gson g = new Gson();
-        Token t = g.fromJson(id, Token.class);
-        System.out.println(t);
-        User result = userRepository.findUserById(Integer.valueOf(t.getToken()));
+
+        String myId = convertToken(id, Token.class);
+        User result = userRepository.findUserById(Integer.valueOf(myId));
         return result;
     }
 
@@ -358,5 +337,12 @@ public class UserService {
             return true;
         }
         return false;
+    }
+
+
+    private String convertToken(String token, Class<?> c) {
+        Gson g = new Gson();
+        Token t = g.fromJson(token, Token.class);
+        return t.getToken();
     }
 }
