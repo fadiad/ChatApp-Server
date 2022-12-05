@@ -12,13 +12,13 @@ class EmailActivationTest {
 
     @Test
     void sendSuccessRegisterationMessageToUserTest() {
-        ActiveUser user1 = new ActiveUser("saraysara1996@gmail.com", "sdzfg", "Sarayy");
+        ActiveUser user1 = new ActiveUser("saraysara1996@gmail.com", "sdzavrbtbdfg", "Sarayy");
         sendSuccessRegisterationMessageToUser(user1);
     }
 
     @Test
     void sendEmailWithGenerateCodeT() {
-        ActiveUser user1 = new ActiveUser("saraysara1996@gmail.com", "sdzfg", "Sarayy");
+        ActiveUser user1 = new ActiveUser("saraysara1996@gmail.com", "sdsvwwvsdzfg", "Sarayy");
         sendEmailWithGenerateCode("123", user1);
     }
 }

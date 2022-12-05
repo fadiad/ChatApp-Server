@@ -39,7 +39,7 @@ class ValidationUtilsTest {
 
     @Test
     void validateCurrentPassword_ReturnTrue() {
-        String password = "sdzfg1";
+        String password = "sdzfg12345";
         assertTrue(validatePassword(password));
     }
 
@@ -51,7 +51,7 @@ class ValidationUtilsTest {
 
     @Test
     void registrationUserValidationCurrent_ReturnTrue() {
-        SubmitedUser user1 = new SubmitedUser("saraysara1996@gmail.com", "sdzfg", "Sarayy");
+        SubmitedUser user1 = new SubmitedUser("saraysara1996@gmail.com", "sdz12345fg", "Sarayy");
         assertTrue(registrationUserValidation(user1));
     }
 
@@ -63,7 +63,7 @@ class ValidationUtilsTest {
 
     @Test
     void goodLoginUserValidation_ReturnTrue() {
-        SubmitedUser user1 = new SubmitedUser("saraysara1996@gmail.com", "sdzfg", "Sarayy");
+        SubmitedUser user1 = new SubmitedUser("saraysara1996@gmail.com", "sddwdcdvdzfg", "Sarayy");
         assertTrue(loginUserValidation(user1));
     }
 

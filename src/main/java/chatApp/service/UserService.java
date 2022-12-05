@@ -78,6 +78,12 @@ public class UserService {
         return new Response(200, "new profile saved successfully!");
     }
 
+    /**
+     *
+     * @param code that the user get in the mail with the link
+     * @return response 200 if the function found him on the activate DB
+     * @throws NoSuchAlgorithmException when secret password not valid
+     */
     public Response enterUserToDB(String code) throws NoSuchAlgorithmException, IllegalArgumentException {
         ActiveUser user = activateRepository.findByCode(code);
 

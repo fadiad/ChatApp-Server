@@ -59,7 +59,7 @@ public class UserController {
      * @param token of online user
      * @return the user from the map of the online users in the service
      */
-    @RequestMapping(value = "userByToken", method = RequestMethod.GET) //TODO: problem
+    @RequestMapping(value = "userByToken", method = RequestMethod.GET)
     public ResponseEntity<User> getUserByToken1(@RequestParam String token) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserByToken(token));
     }
@@ -68,7 +68,7 @@ public class UserController {
      * @param id of the user
      * @return search the user by id in the repo, and return the user in the response body
      */
-    @RequestMapping(value = "userById", method = RequestMethod.POST) //TODO: problem
+    @RequestMapping(value = "userById", method = RequestMethod.POST)
     public ResponseEntity<User> getUserById(@RequestBody String id) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(id));
     }
@@ -96,7 +96,7 @@ public class UserController {
         List<ChatMessage> newList = chatService.getAllMessagesByChatId(chatId);
         logger.info(newList);
 
-        return ResponseEntity.status(HttpStatus.OK).body(newList); //list with all message of the "id" room.
+        return ResponseEntity.status(HttpStatus.OK).body(newList);
     }
 
 }

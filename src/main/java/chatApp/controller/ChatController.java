@@ -35,7 +35,6 @@ public class ChatController {
      * @param message
      * @return
      */
-
     @MessageMapping("/plain")
     @SendTo("/topic/mainChat")
     public RecievedMessage sendPlainMessage(RecievedMessage message) {

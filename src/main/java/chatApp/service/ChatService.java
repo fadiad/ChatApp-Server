@@ -20,6 +20,11 @@ public class ChatService {
         this.massegeRepository = massegeRepository;
     }
 
+    /**
+     *
+     * @param chatId the numberCode of the chat
+     * @return all messages from messages repo, that belong to this chatId
+     */
     public List<ChatMessage> getAllMessagesByChatId(String chatId) {
         List<ChatMessage> list = massegeRepository.findAll().stream()
                 .filter(message -> message.getChatId().equals(chatId))
@@ -29,6 +34,10 @@ public class ChatService {
         return list;
     }
 
+    /**
+     *
+     * @param message ChatMessage type, contain all details and save to messages DB
+     */
     public void saveMessagesToDB(ChatMessage message) {
         massegeRepository.save(message);
     }

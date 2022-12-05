@@ -41,7 +41,7 @@ public class AuthenticationController {
         if (ValidationUtils.loginUserValidation(user))
             token = userService.login(user);
 
-        if (token == null)
+        if (token == null || token.isEmpty())
             throw new IllegalArgumentException(String.format("email or password is not correct !"));
 
         return ResponseEntity.ok(token);
@@ -91,7 +91,7 @@ public class AuthenticationController {
 
             EmailActivation.sendEmailWithGenerateCode(myCode, activeU);
 
-            Boolean response = activateService.keepOnDB(activeU);
+            activateService.keepOnDB(activeU);
 
             return ResponseEntity
                     .status(200)
