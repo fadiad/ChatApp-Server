@@ -41,39 +41,16 @@ class UserServiceTest {
     @InjectMocks
     UserService userService;
     private Map<String, SubmitedUser> useresCode = new HashMap<>();
-    private Map<Integer, String> tokens = new HashMap<>();
-
-    @BeforeAll
-    void setup() {
-    }
-
-//    @Test
-//    void addUser_notValidEmail() {
-//        SubmitedUser user1 = new SubmitedUser("", "1234", "sara");
-//
-//        Assertions.assertThrows(SQLDataException.class, () -> userService.addUser(user1), "email is not valid");
-//    }
-
-//    @Test
-//    void addUser_notValidPassword() {
-//        SubmitedUser user1 = new SubmitedUser("dana@gmail.com", " ", "sara");
-//
-//        Assertions.assertThrows(SQLDataException.class, () -> userService.addUser(user1), "password is not valid");
-//    }
-
-//    @Test
-//    void addUser_notValidName() {
-//        SubmitedUser user1 = new SubmitedUser("dana@gmail.com", "1234", "");
-//
-//        assertThrows(SQLDataException.class, () -> userService.addUser(user1), "name is not valid");
-//    }
 
     @Test
-    void enterNullSubmitUserToDbTest() throws NoSuchAlgorithmException {
-        useresCode.put("1", null);
-        Response r = new Response(400, "User that you are trying to validat is not existed");
+    void addGuestToDbTest() {
+        Guest GGG = new Guest("saraa");
+        userService.addGuest(GGG);
+        ArgumentCaptor<Guest> guestArgumentCaptor = ArgumentCaptor.forClass(Guest.class);
+        verify(guestRepository).save(guestArgumentCaptor.capture());
+        Guest Guest = guestArgumentCaptor.getValue();
 
-        assertEquals(r.getMessage(), userService.enterUserToDB("1").getMessage());
+        assertThat(Guest).isEqualTo(GGG);
     }
 
     @Test
@@ -97,24 +74,12 @@ class UserServiceTest {
 
         assertNull(userService.login(user1));
     }
-
-    @Test
-    void addGuestToDbTest() throws SQLDataException {
-        Guest GGG = new Guest("saraa");
-        userService.addGuest(GGG);
-        ArgumentCaptor<Guest> guestArgumentCaptor = ArgumentCaptor.forClass(Guest.class);
-        verify(guestRepository).save(guestArgumentCaptor.capture());
-        Guest Guest = guestArgumentCaptor.getValue();
-
-        assertThat(Guest).isEqualTo(GGG);
-    }
-
     @Test
     void addTakenNickNameGuestToDbTest() {
         Guest GGG = new Guest("saraaaaaa");
         given(guestRepository.findByNickName(GGG.getNickName())).willReturn(GGG);
 
-        assertThatThrownBy(() -> userService.addGuest(GGG)).isInstanceOf(SQLDataException.class).hasMessageContaining(String.format("Nickname %s exists in guests table", GGG.getNickName()));
+        assertThatThrownBy(() -> userService.addGuest(GGG)).isInstanceOf(IllegalArgumentException.class).hasMessageContaining(String.format("Nickname %s exists in guests table", GGG.getNickName()));
     }
 
     @Test
@@ -123,24 +88,5 @@ class UserServiceTest {
         useresCode.put("1", user);
 
         assertNotNull(userService.getUseresCode());
-
     }
-
-//    @Test
-//    void addTakenEmailAddUser() throws NoSuchAlgorithmException {
-//        SubmitedUser user = new SubmitedUser("saraysara@gmail.com", "12345678", "Sasasa");
-//        User myUser = new User.Builder(user.getEmail(), ValidationUtils.secretPassword(user.getPassword()), user.getNickName()).build();
-//        given(userRepository.findByEmail(user.getEmail())).willReturn(myUser);
-//
-//        assertThatThrownBy(() -> userService.addUser(user)).isInstanceOf(SQLDataException.class).hasMessageContaining(String.format("Email \" %s \" is Already Exist!", user.getEmail()));
-//    }
-
-//    @Test
-//    void addTestUser() throws SQLDataException {
-//        SubmitedUser user = new SubmitedUser("saraysara@gmail.com", "12345678", "Sasasa");
-//        int response = userService.addUser(user).getStatus();
-//
-//        assertEquals(response, 200);
-//    }
-
 }
